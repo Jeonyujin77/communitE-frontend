@@ -1,16 +1,8 @@
 import styled from "styled-components";
 
 const Header = () => {
-  return (
-    <HeaderSection>
-      <HeaderContainer>Header</HeaderContainer>
-    </HeaderSection>
-  );
+  return <HeaderContainer>Header</HeaderContainer>;
 };
-
-const HeaderSection = styled.div`
-  padding: 20px 90px 20px 90px;
-`;
 
 const HeaderContainer = styled.div`
   display: flex;

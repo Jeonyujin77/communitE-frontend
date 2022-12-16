@@ -10,7 +10,7 @@ Section.propTypes = {
 };
 
 const DefaultSection = styled.div`
-  padding: 60px 90px 60px 90px;
+  padding: 50px 0;
 `;
 
 export default Section;
