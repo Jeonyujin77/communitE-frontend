@@ -1,7 +1,12 @@
 import React from "react";
+import Section from "../components/layout/Section";
 
 const Home = () => {
-  return <div>Home</div>;
+  return (
+    <>
+      <Section>ss</Section>
+    </>
+  );
 };
 
 export default Home;
