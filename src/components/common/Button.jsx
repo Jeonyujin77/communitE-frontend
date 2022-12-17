@@ -2,9 +2,15 @@ import { Colors } from "../../styles";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 
-const Button = ({ children, btnTheme, onClick }) => {
+const Button = ({ children, btnTheme, width, height, fontSize, onClick }) => {
   return (
-    <StyledButton btnTheme={btnTheme} onClick={onClick}>
+    <StyledButton
+      btnTheme={btnTheme}
+      width={width}
+      height={height}
+      fontSize={fontSize}
+      onClick={onClick}
+    >
       {children}
     </StyledButton>
   );
@@ -21,7 +27,9 @@ Button.defaultProps = {
 };
 
 const StyledButton = styled.button`
-  padding: 6px 22px 6px 22px;
+  width: ${(width) => width};
+  height: ${(height) => height};
+  font-size: ${(fontSize) => fontSize};
   cursor: pointer;
   font-weight: 700;
   border-radius: 6px;
