@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
+import axios from "../../node_modules/axios/index";
 import { useNavigate } from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
@@ -15,6 +16,8 @@ const WritePage = () => {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [imgUrl, setImgUrl] = useState("");
+  const [imgData, setImgData] = useState();
 
   const writeTitle = ({ target: { value } }) => {
     setTitle(value);
@@ -22,15 +25,27 @@ const WritePage = () => {
   const writeDesc = ({ target: { value } }) => {
     setDesc(value);
   };
-
-  const postSubmit = () => {
+  // 이미지 미리보기
+  const writeImgUrl = ({ target: { files } }) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(files[0]);
+    fileReader.onloadend = () => {
+      setImgUrl(fileReader.result);
+    };
+    setImgData(files[0]);
+  };
+  const postSubmit = async () => {
     if (!title) {
       setErrorMessage("제목을 입력해 주세요.");
     } else if (!desc) {
       setErrorMessage("내용을 입력해 주세요.");
     } else {
-      console.log("submit");
-      navigate("/");
+      const formData = new FormData();
+      formData.append("image", imgData);
+      formData.append("title", title);
+      formData.append("content", desc);
+
+      await axios.post("http://geniuskim.shop/api/posts", formData);
     }
   };
   const errRemove = () => {
@@ -73,12 +88,21 @@ const WritePage = () => {
           </li>
         </ul>
       </WriteWrap>
-      <WriteWrap>
+      <WriteWrap thumnail={imgUrl}>
         <label>이미지</label>
         <div className="WriteImgWrap">
           <div className="WriteImg"></div>
-          <button className="WriteImgBtn">add</button>
+          <label className="WriteImgBtn" htmlFor="postImg">
+            add
+          </label>
+          <input
+            id={"postImg"}
+            type={"file"}
+            accept="image/*"
+            onChange={writeImgUrl}
+          />
         </div>
+
         <ul className="inputExplain">
           <li>이미지의 용량은 {ImgVolume} 이하로 업로드 해주세요. </li>
           <li>
@@ -125,6 +149,9 @@ const WriteWrap = styled.div`
     outline: none;
     font-size: 20px;
   }
+  input[type="file"] {
+    display: none;
+  }
   textarea {
     resize: none;
     width: 98%;
@@ -149,23 +176,30 @@ const WriteWrap = styled.div`
     width: 200px;
     height: 200px;
     background-color: gray;
-    border: 1px solid white;
+    background-image: Url(${({ thumnail }) => thumnail});
+    background-size: cover;
+    background-position: center;
+
+    border: 2px solid white;
     border-radius: 10px;
-    box-shadow: 3px 3px 5px 1px #8080806c;
+    box-shadow: 2px 2px 5px 2px #8080806c;
   }
   .WriteImgBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 50px;
     height: 50px;
     border: 1px solid #9c88ff;
-    background-color: white;
-    color: #9c88ff;
+    background-color: #9c88ff;
+    color: white;
     font-size: 17px;
     font-weight: bold;
     outline: none;
     cursor: pointer;
     position: absolute;
     left: 165px;
-    bottom: -15px;
+    bottom: -30px;
     z-index: 50;
     border-radius: 50px;
     box-shadow: 0 0 5px 1px #8080806c;
