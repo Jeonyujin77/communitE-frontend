@@ -5,6 +5,7 @@ import Header from "./Header";
 const LayoutWrapper = styled.div`
   max-width: 1200px;
   min-width: 780px;
+  padding-top: 20px;
   margin: 0 auto;
 `;
 const Layout = ({ children }) => {
