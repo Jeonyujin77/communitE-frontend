@@ -3,7 +3,6 @@ import styled from "styled-components";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/layout/Section";
-import { Colors } from "../styles/colors";
 
 const Join = () => {
   return (
@@ -45,10 +44,6 @@ const Join = () => {
 const JoinWrapper = styled.div`
   margin: 50px auto;
   width: 480px;
-
-  Button {
-    margin-left: 5px;
-  }
 `;
 
 const ButtonWrapper = styled.div`
@@ -59,6 +54,9 @@ const ButtonWrapper = styled.div`
 `;
 const JoinRow = styled.div`
   margin: 10px 0;
+  Button {
+    margin-left: 5px;
+  }
 `;
 const MessageBox = styled.p`
   font-size: 13px;

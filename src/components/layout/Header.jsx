@@ -13,7 +13,9 @@ const Header = () => {
           <Profile>
             <img src="https://i.ibb.co/zPcdbH8/pngegg.png" alt="기본프로필" />
           </Profile>
-          <span>닉네임님, 환영합니다!</span>
+          <span>
+            <a href="/mypage">닉네임님, 환영합니다!</a>
+          </span>
           <a href="/join">회원가입</a>
           <a href="/">로그아웃</a>
         </MyMenu>
@@ -71,14 +73,13 @@ const Profile = styled.span`
   width: 50px;
   height: 50px;
   line-height: 50px;
-  vertical-align: middle;
   background-color: ${Colors.lightGrey};
   border-radius: 50px;
   text-align: center;
   img {
-    width: 30px;
-    height: 30px;
-    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
     vertical-align: middle;
   }
 `;
