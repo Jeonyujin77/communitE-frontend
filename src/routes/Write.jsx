@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "../../node_modules/axios/index";
-import { useNavigate } from "../../node_modules/react-router-dom/dist/index";
+import {
+  useNavigate,
+  useParams,
+} from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 
 const WritePage = () => {
+  const params = useParams().id;
   const navigate = useNavigate();
 
   // 제목, 내용 길이 제한 || 이미지 용량 제한
@@ -13,19 +17,51 @@ const WritePage = () => {
   const descLength = 3000;
   const ImgVolume = "500MB";
 
+  //제목, 내용 state
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+
+  //error 메시지 state
   const [errorMessage, setErrorMessage] = useState("");
+
+  //image 관련 state
   const [imgUrl, setImgUrl] = useState("");
   const [imgData, setImgData] = useState();
-
+  // ------------------------------------------------------------------
+  // image url을  fileObject로 변환하는 함수
+  const URLtoFile = async (url) => {
+    await axios
+      .get(url)
+      .then((res) => res.blob())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
+  };
+  //params를 통해 초기값을 가져옴
+  const getPostedData = async () => {
+    const {
+      data: { post },
+    } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+    setTitle(post.title);
+    setDesc(post.content);
+    setImgUrl(post.image);
+    setImgData(URLtoFile(post.image));
+  };
+  //params가 들어온다면 state의 초기값을 지정
+  useEffect(() => {
+    if (params) {
+      getPostedData();
+    }
+  }, []);
+  // ------------------------------------------------------------------
+  //제목, 내용 작성
   const writeTitle = ({ target: { value } }) => {
     setTitle(value);
   };
   const writeDesc = ({ target: { value } }) => {
     setDesc(value);
   };
-  // 이미지 미리보기
+
+  // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = ({ target: { files } }) => {
     const fileReader = new FileReader();
     fileReader.readAsDataURL(files[0]);
@@ -34,20 +70,39 @@ const WritePage = () => {
     };
     setImgData(files[0]);
   };
+
+  //submit
   const postSubmit = async () => {
     if (!title) {
       setErrorMessage("제목을 입력해 주세요.");
     } else if (!desc) {
       setErrorMessage("내용을 입력해 주세요.");
     } else {
+      //formData 형식으로 보냄
       const formData = new FormData();
+
+      //data append
       formData.append("image", imgData);
       formData.append("title", title);
       formData.append("content", desc);
 
-      await axios.post("http://geniuskim.shop/api/posts", formData);
+      if (params) {
+        // params가 있을 경우 put 요청 후 해당 페이지로 이동
+        await axios.put(
+          `${process.env.REACT_APP_URL}/api/posts/${params}`,
+          formData
+        );
+
+        navigate(`/post/${params}`);
+      } else {
+        // 없으면 post 요청 후 메인 페이지로 이동
+        await axios.post(`${process.env.REACT_APP_URL}/api/posts`, formData);
+        navigate("/");
+      }
     }
   };
+
+  // 에러 메시지 초기화
   const errRemove = () => {
     setErrorMessage("");
   };

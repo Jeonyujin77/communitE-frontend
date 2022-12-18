@@ -27,7 +27,7 @@ const Home = () => {
     try {
       const {
         data: { posts },
-      } = await axios.get("http://geniuskim.shop/api/posts");
+      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts`);
       dispatch(getPostsData(posts));
     } catch (err) {
       console.log(err);

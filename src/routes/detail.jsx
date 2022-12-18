@@ -5,7 +5,10 @@ import {
   useDispatch,
   useSelector,
 } from "../../node_modules/react-redux/es/exports";
-import { useParams } from "../../node_modules/react-router-dom/dist/index";
+import {
+  useNavigate,
+  useParams,
+} from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import { getPostData } from "../redux/modules/postSlice";
@@ -82,6 +85,7 @@ const CommentComponent = ({ list: { nickname, desc } }) => {
 };
 const DetailPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const params = useParams().id;
 
@@ -116,7 +120,7 @@ const DetailPage = () => {
     try {
       const {
         data: { post },
-      } = await axios.get(`http://geniuskim.shop/api/posts/${params}`);
+      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${params}`);
       dispatch(getPostData(post));
     } catch (error) {
       console.log(error);
@@ -133,12 +137,17 @@ const DetailPage = () => {
   //게시글 삭제
   const postDelete = async () => {
     console.log("게시물 삭제");
-    // await axios.delete(`http://geniuskim.shop/api/posts/${params}`);
+    // await axios.delete(`${process.env.REACT_APP_URL}/api/posts/${params}`);
   };
 
   // 댓글 등록
   const commentPost = () => {
     console.log("댓글 등록");
+  };
+
+  // 수정 버튼 클릭 시 페이지 이동
+  const goToEdit = () => {
+    navigate(`/edit/${params}`);
   };
 
   // 렌더링 시 데이터 조회
@@ -154,7 +163,7 @@ const DetailPage = () => {
           <div className="postdate">{post.createdAt}</div>
         </div>
         <div className="btnWrap">
-          <Button width={"100px"} height={"40px"}>
+          <Button width={"100px"} height={"40px"} onClick={goToEdit}>
             게시글 수정
           </Button>
           <Button onClick={postDelete} width={"100px"} height={"40px"}>
