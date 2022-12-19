@@ -1,26 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/layout/Section";
+import useInput from "../hooks/useInput";
+import { __getUserInfo } from "../lib/userApi";
 
 const MypageEdit = () => {
+  const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
+  const dispatch = useDispatch();
+  const [nickname, setNickname, nicknameHandler] = useInput(user?.nickname);
+  const [profile, setProfile] = useState("");
+
+  useEffect(() => {
+    dispatch(__getUserInfo(user?.userId));
+  }, []);
+
+  if (!user) {
+    return <></>;
+  }
+
+  const onChangeFile = (event) => {
+    if (event.target.files !== undefined) {
+      setProfile(event.target.files[0]);
+    }
+  };
+
+  const onSubmit = (event) => {
+    event.preventDefault();
+  };
+
   return (
     <Section>
       <MypageEditWrapper>
         <h2>프로필 수정</h2>
-        <form>
+        <form onSubmit={onSubmit}>
           <Row>
-            <Input type="file" width="350px" />
+            <Input type="file" width="350px" onChange={onChangeFile} />
             <MessageBox>프로필 이미지 사진을 첨부해주세요</MessageBox>
           </Row>
           <Row>
-            <Input type="text" width="350px" value="닉네임" />
-            <Button btnTheme="secondary">중복확인</Button>
+            <Input
+              type="text"
+              width="350px"
+              value={nickname}
+              onChange={nicknameHandler}
+              required
+            />
+            <Button btnTheme="secondary" width="80px" height="30px">
+              중복확인
+            </Button>
             <MessageBox>닉네임을 입력해주세요</MessageBox>
           </Row>
           <ButtonWrapper>
-            <Button>수정하기</Button>
+            <Button width="100px" height="30px" type="submit">
+              수정하기
+            </Button>
           </ButtonWrapper>
         </form>
       </MypageEditWrapper>

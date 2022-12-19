@@ -27,10 +27,11 @@ const Login = () => {
             />
           </LoginRow>
           {/* <MessageBox>아이디를 입력해주세요</MessageBox> */}
-          <Button>로그인</Button>
+          <Button width="100px" height="30px">
+            로그인
+          </Button>
         </LoginForm>
-        {/* ToDo: 회원가입 페이지로 이동 */}
-        <Link>회원가입</Link>
+        <Link to="/join">회원가입</Link>
       </LoginWrapper>
     </Section>
   );
