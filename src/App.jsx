@@ -22,6 +22,7 @@ function App() {
           <Route exact path="/" element={<Home />} />
           <Route exact path="/post/:id" element={<DetailPage />} />
           <Route exact path="/write" element={<WritePage />} />
+          <Route exact path="/edit/:id" element={<WritePage />} />
         </Routes>
       </Layout>
     </Router>

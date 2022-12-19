@@ -1,48 +1,19 @@
 import styled from "styled-components";
 import { useNavigate } from "../../../node_modules/react-router-dom/dist/index";
 
-const PostListContainer = () => {
+const PostListContainer = ({ posts }) => {
   const navigate = useNavigate();
-  //임시 json객체
-  const list = [
-    {
-      id: 1,
-      nickname: "royud",
-      title: "wow",
-      createdAt: "2022.00.00",
-    },
-    {
-      id: 2,
-      nickname: "royuddddddddddddddddddddddddddddddddddddddddd",
-      title: "wowwwwwwwwwwwwwwwwwwwww",
-      createdAt: "2022.00.00",
-    },
-    {
-      id: 3,
-      nickname: "royud",
-      title: "wow",
-      createdAt: "2022.00.00",
-    },
-    {
-      id: 4,
-      nickname: "royud",
-      title: "wow",
-      createdAt: "2022.00.00",
-    },
-    {
-      id: 5,
-      nickname: "royud",
-      title: "wow",
-      createdAt: "2022.00.00",
-    },
-  ];
   const goToDetail = (id) => {
     navigate(`/post/${id}`);
   };
   return (
     <PostListWrapper>
-      {list.map((post) => (
-        <PostList key={post.id} onClick={() => goToDetail(post.id)}>
+      {posts.map((post) => (
+        <PostList
+          key={post.postId}
+          onClick={() => goToDetail(post.postId)}
+          thumnail={post.image}
+        >
           <div className="postImg"></div>
           <PostComtent>
             <div className="postTitle">{post.title}</div>
@@ -74,12 +45,17 @@ const PostList = styled.li`
     background-color: #8d85b8;
     border-radius: 10px;
     margin-bottom: 10px;
+    background-image: url(${({ thumnail }) => thumnail});
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 `;
 const PostComtent = styled.div`
   padding: 0 10px;
   .postTitle {
     font-size: 25px;
+    margin-bottom: 10px;
     font-weight: bold;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useParams } from "../../node_modules/react-router-dom/dist/index";
+import axios from "../../node_modules/axios/index";
+import {
+  useDispatch,
+  useSelector,
+} from "../../node_modules/react-redux/es/exports";
+import {
+  useNavigate,
+  useParams,
+} from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
+import { getPostData } from "../redux/modules/postSlice";
 
 const CommentToggle = ({ desc, inputActive }) => {
   const [inputValue, setInputValue] = useState("");
@@ -75,8 +84,14 @@ const CommentComponent = ({ list: { nickname, desc } }) => {
   );
 };
 const DetailPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const params = useParams().id;
 
+  const [fullView, setFullView] = useState(false);
+
+  //임시 댓글
   const commentList = [
     {
       id: 1,
@@ -100,35 +115,72 @@ const DetailPage = () => {
     },
   ];
 
+  // 상세페이지 데이터 redux에 저장
+  const getPost = async () => {
+    try {
+      const {
+        data: { post },
+      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+      dispatch(getPostData(post));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //redux에 저장된 상세페이지 데이터 소환
+  const post = useSelector((state) => state.posts.post);
+
+  //이미지 클릭 시 토글
+  const FullViewToggle = () => {
+    setFullView(!fullView);
+  };
+  //게시글 삭제
+  const postDelete = async () => {
+    console.log("게시물 삭제");
+    // await axios.delete(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+  };
+
   // 댓글 등록
   const commentPost = () => {
     console.log("댓글 등록");
   };
 
+  // 수정 버튼 클릭 시 페이지 이동
+  const goToEdit = () => {
+    navigate(`/edit/${params}`);
+  };
+
+  // 렌더링 시 데이터 조회
+  useEffect(() => {
+    getPost();
+  }, []);
   return (
     <>
       <DetailTop>
-        <div className="postTitle">wow</div>
+        <div>
+          <div className="postTitle">{post.title}</div>
+          <div className="postNickname">{post.nickname}</div>
+          <div className="postdate">{post.createdAt}</div>
+        </div>
         <div className="btnWrap">
-          <Button width={"100px"} height={"40px"}>
+          <Button width={"100px"} height={"40px"} onClick={goToEdit}>
             게시글 수정
           </Button>
-          <Button width={"100px"} height={"40px"}>
+          <Button onClick={postDelete} width={"100px"} height={"40px"}>
             게시글 삭제
           </Button>
         </div>
       </DetailTop>
-      <PostImg>
+      <PostImg
+        mainImg={post.image}
+        onClick={FullViewToggle}
+        fullView={fullView}
+      >
         <div className="PostImg"></div>
       </PostImg>
       <Section>
         <PostContent>
-          <div className="postDesc">
-            찬미를 위하여 그들은 열매를 되는 길지 교향악이다. 같이, 뜨고,
-            용기가얼마나청춘의청춘의사막이다. 청춘은 웅대한 스며들어 평화스러운
-            오직 쓸쓸하랴? 인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기
-            구하지 눈이 가는 있다.
-          </div>
+          <div className="postDesc">{post.content}</div>
         </PostContent>
       </Section>
       <CommentWrap>
@@ -155,11 +207,18 @@ const DetailPage = () => {
 const DetailTop = styled.div`
   margin: 30px 0 10px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
   .postTitle {
     font-size: 40px;
     font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .postNickname {
+    color: #4e4e4e;
+    margin-bottom: 10px;
+  }
+  .postdate {
+    color: gray;
   }
   .btnWrap {
     display: flex;
@@ -168,9 +227,27 @@ const DetailTop = styled.div`
 `;
 const PostImg = styled.div`
   width: 100%;
-  height: 400px;
+  height: 500px;
+  margin: 0 auto;
+  background-color: black;
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)),
+    Url(${({ mainImg }) => mainImg});
+  background-size: 110%;
+  background-position: center;
+
   border-radius: 10px;
-  background-color: #d1d1d1;
+  cursor: pointer;
+  .PostImg {
+    width: auto;
+    margin: 0 auto;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    background-image: Url(${({ mainImg }) => mainImg});
+    background-size: ${({ fullView }) => (fullView ? "contain" : "cover")};
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+  }
 `;
 const PostContent = styled.div`
   width: 100%;

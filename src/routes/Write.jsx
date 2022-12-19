@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "../../node_modules/react-router-dom/dist/index";
+import axios from "../../node_modules/axios/index";
+import {
+  useNavigate,
+  useParams,
+} from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 
 const WritePage = () => {
+  const params = useParams().id;
   const navigate = useNavigate();
 
   // 제목, 내용 길이 제한 || 이미지 용량 제한
@@ -12,10 +17,34 @@ const WritePage = () => {
   const descLength = 3000;
   const ImgVolume = "500MB";
 
+  //제목, 내용 state
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+
+  //error 메시지 state
   const [errorMessage, setErrorMessage] = useState("");
 
+  //image 관련 state
+  const [imgUrl, setImgUrl] = useState("");
+  const [imgData, setImgData] = useState("");
+  // ------------------------------------------------------------------
+  //params를 통해 초기값을 가져옴
+  const getPostedData = async () => {
+    const {
+      data: { post },
+    } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+    setTitle(post.title);
+    setDesc(post.content);
+    setImgUrl(post.image);
+  };
+  //params가 들어온다면 state의 초기값을 지정
+  useEffect(() => {
+    if (params) {
+      getPostedData();
+    }
+  }, []);
+  // ------------------------------------------------------------------
+  //제목, 내용 작성
   const writeTitle = ({ target: { value } }) => {
     setTitle(value);
   };
@@ -23,16 +52,56 @@ const WritePage = () => {
     setDesc(value);
   };
 
-  const postSubmit = () => {
+  // 이미지 미리보기, blob데이터를 state에 저장
+  const writeImgUrl = ({ target: { files } }) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(files[0]);
+    fileReader.onloadend = () => {
+      setImgUrl(fileReader.result);
+    };
+    setImgData(files[0]);
+  };
+  // 원치 않는 이미지일 경우 지우는 작업
+  const imgRemove = () => {
+    setImgUrl("");
+    setImgData("removed");
+  };
+  //submit
+  const postSubmit = async () => {
     if (!title) {
       setErrorMessage("제목을 입력해 주세요.");
     } else if (!desc) {
       setErrorMessage("내용을 입력해 주세요.");
     } else {
-      console.log("submit");
-      navigate("/");
+      //formData 형식으로 보냄
+      const formData = new FormData();
+
+      //data append
+      if (imgData === "removed") {
+        formData.append("image", null);
+      } else if (imgData !== "") {
+        formData.append("image", imgData);
+      }
+      formData.append("title", title);
+      formData.append("content", desc);
+
+      if (params) {
+        // params가 있을 경우 put 요청 후 해당 페이지로 이동
+        await axios.put(
+          `${process.env.REACT_APP_URL}/api/posts/${params}`,
+          formData
+        );
+
+        navigate(`/post/${params}`);
+      } else {
+        // 없으면 post 요청 후 메인 페이지로 이동
+        await axios.post(`${process.env.REACT_APP_URL}/api/posts`, formData);
+        navigate("/");
+      }
     }
   };
+
+  // 에러 메시지 초기화
   const errRemove = () => {
     setErrorMessage("");
   };
@@ -73,12 +142,28 @@ const WritePage = () => {
           </li>
         </ul>
       </WriteWrap>
-      <WriteWrap>
+      <WriteWrap thumnail={imgUrl}>
         <label>이미지</label>
         <div className="WriteImgWrap">
           <div className="WriteImg"></div>
-          <button className="WriteImgBtn">add</button>
+          <label className="WriteImgBtn" htmlFor="postImg">
+            add
+          </label>
+          <input
+            id={"postImg"}
+            type={"file"}
+            accept="image/jpg"
+            onChange={writeImgUrl}
+          />
         </div>
+        <Button
+          onClick={imgRemove}
+          width={"100px"}
+          height={"40px"}
+          fontSize={"18px"}
+        >
+          remove
+        </Button>
         <ul className="inputExplain">
           <li>이미지의 용량은 {ImgVolume} 이하로 업로드 해주세요. </li>
           <li>
@@ -125,6 +210,9 @@ const WriteWrap = styled.div`
     outline: none;
     font-size: 20px;
   }
+  input[type="file"] {
+    display: none;
+  }
   textarea {
     resize: none;
     width: 98%;
@@ -149,23 +237,30 @@ const WriteWrap = styled.div`
     width: 200px;
     height: 200px;
     background-color: gray;
-    border: 1px solid white;
+    background-image: Url(${({ thumnail }) => thumnail});
+    background-size: cover;
+    background-position: center;
+
+    border: 2px solid white;
     border-radius: 10px;
-    box-shadow: 3px 3px 5px 1px #8080806c;
+    box-shadow: 2px 2px 5px 2px #8080806c;
   }
   .WriteImgBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 50px;
     height: 50px;
     border: 1px solid #9c88ff;
-    background-color: white;
-    color: #9c88ff;
+    background-color: #9c88ff;
+    color: white;
     font-size: 17px;
     font-weight: bold;
     outline: none;
     cursor: pointer;
     position: absolute;
     left: 165px;
-    bottom: -15px;
+    bottom: -30px;
     z-index: 50;
     border-radius: 50px;
     box-shadow: 0 0 5px 1px #8080806c;
