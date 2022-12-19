@@ -44,7 +44,7 @@ const CommentComponent = ({ list: { nickname, desc } }) => {
   };
   // 댓글 삭제
   const commentDelete = () => {
-    console.log("댓글 삭제!");
+    console.log("댓글 삭제");
   };
   // 댓글 수정
   const commentRetouch = () => {
@@ -92,28 +92,29 @@ const DetailPage = () => {
   const [fullView, setFullView] = useState(false);
 
   //임시 댓글
-  const commentList = [
+  const [commentList, setCommentList] = useState([
     {
       id: 1,
       nickname: "로이어드",
-      desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다. 같이, 뜨고, 용기가얼마나청춘의청춘의사막이다. 청춘은 웅대한 스며들어 평화스러운 오직 쓸쓸하랴? 인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기 구하지 눈이 가는 있다.",
+      desc: "인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기 구하지 눈이 가는 있다.",
     },
     {
       id: 2,
       nickname: "로이어드",
-      desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다. 같이, 뜨고, 용기가얼마나청춘의청춘의사막이다. 청춘은 웅대한 스며들어 평화스러운 오직 쓸쓸하랴? 인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기 구하지 눈이 가는 있다.",
+      desc: "청춘은 웅대한 스며들어 평화스러운 오직 쓸쓸하랴?",
     },
     {
       id: 3,
       nickname: "로이어드",
-      desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다. 같이, 뜨고, 용기가얼마나청춘의청춘의사막이다. 청춘은 웅대한 스며들어 평화스러운 오직 쓸쓸하랴? 인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기 구하지 눈이 가는 있다.",
+      desc: " 같이, 뜨고, 용기가얼마나청춘의청춘의사막이다.",
     },
     {
       id: 4,
       nickname: "로이어드",
-      desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다. 같이, 뜨고, 용기가얼마나청춘의청춘의사막이다. 청춘은 웅대한 스며들어 평화스러운 오직 쓸쓸하랴? 인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기 구하지 눈이 가는 있다.",
+      desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다",
     },
-  ];
+  ]);
+  //최신순
 
   // 상세페이지 데이터 redux에 저장
   const getPost = async () => {
@@ -136,15 +137,31 @@ const DetailPage = () => {
   };
   //게시글 삭제
   const postDelete = async () => {
-    console.log("게시물 삭제");
-    // await axios.delete(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+    if (window.confirm("게시물을 삭제하시겠습니까?")) {
+      await axios.delete(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+      navigate("/");
+    }
+  };
+  // --------------------------------------------------------------------
+  const [wroteComment, setwroteComment] = useState("");
+  const setCommentDesc = ({ target: { value } }) => {
+    setwroteComment(value);
   };
 
   // 댓글 등록
   const commentPost = () => {
-    console.log("댓글 등록");
+    //넣을 새 댓글
+    const newComment = {
+      id: Date.now(),
+      nickname: "로이어드",
+      desc: wroteComment,
+    };
+    setCommentList([newComment, ...commentList]);
+    setwroteComment("");
   };
-
+  useEffect(() => {
+    setCommentList(commentList.sort((a, b) => b.id - a.id));
+  }, []);
   // 수정 버튼 클릭 시 페이지 이동
   const goToEdit = () => {
     navigate(`/edit/${params}`);
@@ -193,7 +210,7 @@ const DetailPage = () => {
               등록
             </Button>
           </div>
-          <textarea></textarea>
+          <textarea onChange={setCommentDesc} value={wroteComment}></textarea>
         </CommentInputWrap>
         {commentList.map((list) => (
           <CommentComponent key={list.id} list={list} />
