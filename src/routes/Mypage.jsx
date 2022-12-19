@@ -1,25 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import { Colors } from "../styles/colors";
+import { useDispatch, useSelector } from "react-redux";
+import { __getUserInfo } from "../lib/userApi";
+import { getUserInfo } from "../redux/modules/userSlice";
 
 const Mypage = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
+  const dispatch = useDispatch();
+
+  // 화면이 로드됨과 동시에 사용자정보를 조회한다
+  useEffect(() => {
+    // 로그인한 상태인 경우에만!
+    if (user !== null) {
+      dispatch(__getUserInfo(user?.userId)).then((res) => {
+        // store에 사용자정보 저장
+        const { user } = res.payload;
+        dispatch(getUserInfo(user));
+      });
+    } else {
+      // 로그인 안하고 바로 마이페이지접근 시 로그인페이지로 리다이렉트시킴
+      navigate("/login");
+    }
+  }, []);
+
   const onProfileEdit = () => {
-    navigate("/mypagemodify");
+    navigate(`/mypagemodify`);
   };
 
-  return (
+  return user ? (
     <Section>
       <ProfileWrapper>
         <ProfileBox>
-          <img src="https://i.ibb.co/zPcdbH8/pngegg.png" alt="기본프로필" />
+          <img src={`${user.image}`} alt="기본프로필" />
         </ProfileBox>
         <UserInfo>
-          <p>닉네임</p>
-          <Button btnTheme="secondary" onClick={onProfileEdit}>
+          <p>{`${user.nickname}`}</p>
+          <Button
+            btnTheme="secondary"
+            width="80px"
+            height="30px"
+            onClick={onProfileEdit}
+          >
             프로필 수정
           </Button>
         </UserInfo>
@@ -28,6 +54,8 @@ const Mypage = () => {
         <h3>내 게시글</h3>
       </UsersPosts>
     </Section>
+  ) : (
+    ""
   );
 };
 
