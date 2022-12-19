@@ -6,6 +6,7 @@ import Section from "../components/layout/Section";
 import { Colors } from "../styles/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { __getUserInfo } from "../lib/userApi";
+import { getUserInfo } from "../redux/modules/userSlice";
 
 const Mypage = () => {
   const navigate = useNavigate();
@@ -13,7 +14,10 @@ const Mypage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(__getUserInfo(user?.userId));
+    dispatch(__getUserInfo(user?.userId)).then((res) => {
+      const { user } = res.payload;
+      dispatch(getUserInfo(user));
+    });
   }, []);
 
   if (!user) {
