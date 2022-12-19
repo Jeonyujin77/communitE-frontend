@@ -26,16 +26,8 @@ const WritePage = () => {
 
   //image 관련 state
   const [imgUrl, setImgUrl] = useState("");
-  const [imgData, setImgData] = useState();
+  const [imgData, setImgData] = useState("");
   // ------------------------------------------------------------------
-  // image url을  fileObject로 변환하는 함수
-  const URLtoFile = async (url) => {
-    await axios
-      .get(url)
-      .then((res) => res.blob())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
-  };
   //params를 통해 초기값을 가져옴
   const getPostedData = async () => {
     const {
@@ -44,7 +36,6 @@ const WritePage = () => {
     setTitle(post.title);
     setDesc(post.content);
     setImgUrl(post.image);
-    setImgData(URLtoFile(post.image));
   };
   //params가 들어온다면 state의 초기값을 지정
   useEffect(() => {
@@ -70,7 +61,11 @@ const WritePage = () => {
     };
     setImgData(files[0]);
   };
-
+  // 원치 않는 이미지일 경우 지우는 작업
+  const imgRemove = () => {
+    setImgUrl("");
+    setImgData("removed");
+  };
   //submit
   const postSubmit = async () => {
     if (!title) {
@@ -82,7 +77,11 @@ const WritePage = () => {
       const formData = new FormData();
 
       //data append
-      formData.append("image", imgData);
+      if (imgData === "removed") {
+        formData.append("image", null);
+      } else if (imgData !== "") {
+        formData.append("image", imgData);
+      }
       formData.append("title", title);
       formData.append("content", desc);
 
@@ -153,11 +152,18 @@ const WritePage = () => {
           <input
             id={"postImg"}
             type={"file"}
-            accept="image/*"
+            accept="image/jpg"
             onChange={writeImgUrl}
           />
         </div>
-
+        <Button
+          onClick={imgRemove}
+          width={"100px"}
+          height={"40px"}
+          fontSize={"18px"}
+        >
+          remove
+        </Button>
         <ul className="inputExplain">
           <li>이미지의 용량은 {ImgVolume} 이하로 업로드 해주세요. </li>
           <li>
