@@ -26,7 +26,25 @@ export const __getUserInfo = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/user?userId=${payload}`
+        `${process.env.REACT_APP_URL}/api/user/${payload}`
+      );
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+// 사용자 정보 수정
+export const __modifyUserInfo = createAsyncThunk(
+  "modifyUserInfo",
+  async (payload, thunkAPI) => {
+    const { userId, formData } = payload;
+
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_URL}/api/user/${userId}`,
+        formData
       );
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
@@ -41,17 +59,8 @@ export const __getUserInfo = createAsyncThunk(
 //     api.post("/api/user/login", { loginId, password }),
 //   // 로그아웃
 //   logout: () => api.put("/api/user/logout", {}),
-//   // 회원가입
-//   signup: (loginId, password, nickname) => {
-//     api.post("/api/user/signup", { loginId, password, nickname });
-//   },
-
 //   // 아이디 중복검사
 //   chkLoginIdDup: (loginId) => api.get(`/api/user/signup/${loginId}`),
 //   // 닉네임 중복검사
 //   chkNicknameDup: (nickname) => api.get(`/api/user/signup/${nickname}`),
-//   // 사용자 정보 조회
-//   getUserInfo: (userId) => api.get(`/api/user/${userId}`),
-//   // 사용자 정보 수정
-//   modifyUserInfo: (userId) => api.put(`/api/user/${userId}`),
 // };

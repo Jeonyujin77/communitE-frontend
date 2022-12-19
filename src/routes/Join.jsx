@@ -24,7 +24,6 @@ const Join = () => {
   const validateLoginId = () => {
     if (loginId !== "" && !idCheck(loginId)) {
       setloginIdValidate(false);
-      setLoginId("");
     } else {
       setloginIdValidate(true);
     }
@@ -34,7 +33,6 @@ const Join = () => {
   const validatePassword = () => {
     if (password !== "" && !pwCheck(password)) {
       setPasswordValidate(false);
-      setPassword("");
     } else {
       setPasswordValidate(true);
     }
@@ -44,7 +42,6 @@ const Join = () => {
   const validateConfirm = () => {
     if (confirm !== "" && password !== confirm) {
       setConfirmValidate(false);
-      setConfirm("");
     } else {
       setConfirmValidate(true);
     }
@@ -53,15 +50,18 @@ const Join = () => {
   // 회원가입
   const onSubmit = (event) => {
     event.preventDefault();
-    dispatch(__signup({ loginId, password, nickname })).then((res) => {
-      const { type } = res;
+    // 입력값 검증이 정상이면
+    if (loginIdValidate && passwordValidate && confirmValidate) {
+      dispatch(__signup({ loginId, password, nickname })).then((res) => {
+        const { type } = res;
 
-      // 응답이 정상이면
-      if (type === "signup/fulfilled") {
-        alert("회원가입이 정상적으로 되었습니다.");
-        navigate("/login");
-      }
-    });
+        // 응답이 정상이면
+        if (type === "signup/fulfilled") {
+          alert("회원가입이 정상적으로 되었습니다.");
+          navigate("/login");
+        }
+      });
+    }
   };
 
   return (
