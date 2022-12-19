@@ -11,7 +11,7 @@ const initialState = {
   },
   loginId: null,
   nickname: null,
-  is_login: false,
+  is_login: true,
   error: null,
 };
 
