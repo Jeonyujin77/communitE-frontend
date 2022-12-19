@@ -7,6 +7,7 @@ import Input from "../components/common/Input";
 import Section from "../components/layout/Section";
 import useInput from "../hooks/useInput";
 import { __getUserInfo, __modifyUserInfo } from "../lib/userApi";
+import { getUserInfo } from "../redux/modules/userSlice";
 
 const MypageEdit = () => {
   const navigate = useNavigate();
@@ -16,13 +17,20 @@ const MypageEdit = () => {
   const [imgUrl, setImgUrl] = useState(user?.image);
   const [imgData, setImgData] = useState(null); // image data
 
+  // 화면이 로드됨과 동시에 사용자정보를 조회한다
   useEffect(() => {
-    dispatch(__getUserInfo(user?.userId));
+    // 로그인한 상태인 경우에만!
+    if (user !== null) {
+      dispatch(__getUserInfo(user?.userId)).then((res) => {
+        // store에 사용자정보 저장
+        const { user } = res.payload;
+        dispatch(getUserInfo(user));
+      });
+    } else {
+      // 로그인 안하고 바로 마이페이지접근 시 로그인페이지로 리다이렉트시킴
+      navigate("/login");
+    }
   }, []);
-
-  if (!user) {
-    return <></>;
-  }
 
   // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = (event) => {
@@ -69,7 +77,7 @@ const MypageEdit = () => {
     });
   };
 
-  return (
+  return user ? (
     <Section>
       <MypageEditWrapper>
         <h2>프로필 수정</h2>
@@ -114,6 +122,8 @@ const MypageEdit = () => {
         </form>
       </MypageEditWrapper>
     </Section>
+  ) : (
+    ""
   );
 };
 
