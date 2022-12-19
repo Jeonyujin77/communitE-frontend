@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "../../node_modules/axios/index";
+import arrayIncludes from "../../node_modules/lodash/_arrayIncludes";
 import {
   useNavigate,
   useParams,
@@ -12,10 +13,11 @@ const WritePage = () => {
   const params = useParams().id;
   const navigate = useNavigate();
 
-  // 제목, 내용 길이 제한 || 이미지 용량 제한
+  // 제목, 내용 길이 제한 || 이미지 용량, 형식 제한
   const titleLength = 50;
   const descLength = 3000;
   const ImgVolume = "500MB";
+  const imgType = ["image/jpg", "image/jpeg", "image/png"];
 
   //제목, 내용 state
   const [title, setTitle] = useState("");
@@ -54,12 +56,16 @@ const WritePage = () => {
 
   // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = ({ target: { files } }) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(files[0]);
-    fileReader.onloadend = () => {
-      setImgUrl(fileReader.result);
-    };
-    setImgData(files[0]);
+    if (!imgType.includes(files[0].type)) {
+      alert("파일 형식이 잘못되었습니다.");
+    } else {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files[0]);
+      fileReader.onloadend = () => {
+        setImgUrl(fileReader.result);
+      };
+      setImgData(files[0]);
+    }
   };
   // 원치 않는 이미지일 경우 지우는 작업
   const imgRemove = () => {
@@ -86,17 +92,21 @@ const WritePage = () => {
       formData.append("content", desc);
 
       if (params) {
-        // params가 있을 경우 put 요청 후 해당 페이지로 이동
-        await axios.put(
-          `${process.env.REACT_APP_URL}/api/posts/${params}`,
-          formData
-        );
+        if (window.confirm("수정하시겠습니까?")) {
+          // params가 있을 경우 put 요청 후 해당 페이지로 이동
+          await axios.put(
+            `${process.env.REACT_APP_URL}/api/posts/${params}`,
+            formData
+          );
 
-        navigate(`/post/${params}`);
+          navigate(`/post/${params}`);
+        }
       } else {
-        // 없으면 post 요청 후 메인 페이지로 이동
-        await axios.post(`${process.env.REACT_APP_URL}/api/posts`, formData);
-        navigate("/");
+        if (window.confirm("등록하시겠습니까?")) {
+          // 없으면 post 요청 후 메인 페이지로 이동
+          await axios.post(`${process.env.REACT_APP_URL}/api/posts`, formData);
+          navigate("/");
+        }
       }
     }
   };
@@ -152,7 +162,7 @@ const WritePage = () => {
           <input
             id={"postImg"}
             type={"file"}
-            accept="image/jpg"
+            accept={imgType.join(", ")}
             onChange={writeImgUrl}
           />
         </div>
