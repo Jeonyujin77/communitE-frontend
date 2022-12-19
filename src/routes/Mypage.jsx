@@ -13,22 +13,26 @@ const Mypage = () => {
   const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
   const dispatch = useDispatch();
 
+  // 화면이 로드됨과 동시에 사용자정보를 조회한다
   useEffect(() => {
-    dispatch(__getUserInfo(user?.userId)).then((res) => {
-      const { user } = res.payload;
-      dispatch(getUserInfo(user));
-    });
+    // 로그인한 상태인 경우에만!
+    if (user !== null) {
+      dispatch(__getUserInfo(user?.userId)).then((res) => {
+        // store에 사용자정보 저장
+        const { user } = res.payload;
+        dispatch(getUserInfo(user));
+      });
+    } else {
+      // 로그인 안하고 바로 마이페이지접근 시 로그인페이지로 리다이렉트시킴
+      navigate("/login");
+    }
   }, []);
-
-  if (!user) {
-    return <></>;
-  }
 
   const onProfileEdit = () => {
     navigate(`/mypagemodify`);
   };
 
-  return (
+  return user ? (
     <Section>
       <ProfileWrapper>
         <ProfileBox>
@@ -50,6 +54,8 @@ const Mypage = () => {
         <h3>내 게시글</h3>
       </UsersPosts>
     </Section>
+  ) : (
+    ""
   );
 };
 
