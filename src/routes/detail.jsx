@@ -11,7 +11,11 @@ import {
 } from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
-import { getPostData } from "../redux/modules/postSlice";
+import {
+  getPostData,
+  __deletePostData,
+  __getPostData,
+} from "../redux/modules/postSlice";
 
 const CommentToggle = ({ desc, inputActive }) => {
   const [inputValue, setInputValue] = useState("");
@@ -91,6 +95,32 @@ const DetailPage = () => {
 
   const [fullView, setFullView] = useState(false);
 
+  //redux에 저장된 상세페이지 데이터 소환
+  const post = useSelector((state) => state.posts.post);
+
+  // 렌더링 시 데이터 조회
+  useEffect(() => {
+    dispatch(__getPostData(params));
+  }, [dispatch]);
+
+  //이미지 클릭 시 토글
+  const FullViewToggle = () => {
+    setFullView(!fullView);
+  };
+  // 수정 버튼 클릭 시 페이지 이동
+  const goToEdit = () => {
+    navigate(`/edit/${params}`);
+  };
+  //게시글 삭제
+  const postDelete = async () => {
+    if (window.confirm("게시물을 삭제하시겠습니까?")) {
+      dispatch(__deletePostData(params));
+      navigate("/");
+    }
+  };
+  // --------------------------------------------------------------------
+  const [wroteComment, setwroteComment] = useState("");
+
   //임시 댓글
   const [commentList, setCommentList] = useState([
     {
@@ -114,36 +144,19 @@ const DetailPage = () => {
       desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다",
     },
   ]);
-  //최신순
 
-  // 상세페이지 데이터 redux에 저장
-  const getPost = async () => {
-    try {
-      const {
-        data: { post },
-      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${params}`);
-      dispatch(getPostData(post));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // 댓글 리스트 불러오기
+  // const getComments = async () => {
+  //   const { data } = await axios.get(
+  //     `${process.env.REACT_APP_URL}/api/post/${params}/comments`
+  //   );
+  //   console.log(data);
+  // };
+  // useEffect(() => {
+  //   getComments();
+  // }, []);
 
-  //redux에 저장된 상세페이지 데이터 소환
-  const post = useSelector((state) => state.posts.post);
-
-  //이미지 클릭 시 토글
-  const FullViewToggle = () => {
-    setFullView(!fullView);
-  };
-  //게시글 삭제
-  const postDelete = async () => {
-    if (window.confirm("게시물을 삭제하시겠습니까?")) {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/posts/${params}`);
-      navigate("/");
-    }
-  };
-  // --------------------------------------------------------------------
-  const [wroteComment, setwroteComment] = useState("");
+  //댓글 작성
   const setCommentDesc = ({ target: { value } }) => {
     setwroteComment(value);
   };
@@ -162,18 +175,10 @@ const DetailPage = () => {
   useEffect(() => {
     setCommentList(commentList.sort((a, b) => b.id - a.id));
   }, []);
-  // 수정 버튼 클릭 시 페이지 이동
-  const goToEdit = () => {
-    navigate(`/edit/${params}`);
-  };
 
-  // 렌더링 시 데이터 조회
-  useEffect(() => {
-    getPost();
-  }, []);
   return (
     <>
-      <DetailTop>
+      <DetailTop userId={post.userId}>
         <div>
           <div className="postTitle">{post.title}</div>
           <div className="postNickname">{post.nickname}</div>
@@ -238,7 +243,8 @@ const DetailTop = styled.div`
     color: gray;
   }
   .btnWrap {
-    display: flex;
+    display: ${({ userId }) =>
+      userId === localStorage.getItem("userId") ? "flex" : "none"};
     gap: 10px;
   }
 `;

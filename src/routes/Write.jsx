@@ -8,6 +8,7 @@ import {
 } from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
+import api from "../lib/api";
 
 const WritePage = () => {
   const params = useParams().id;
@@ -104,7 +105,13 @@ const WritePage = () => {
       } else {
         if (window.confirm("등록하시겠습니까?")) {
           // 없으면 post 요청 후 메인 페이지로 이동
-          await axios.post(`${process.env.REACT_APP_URL}/api/posts`, formData);
+          await api.post(`${process.env.REACT_APP_URL}/api/posts`, formData, {
+            headers: {
+              "content-type": "multipart/form-data",
+              accept: "multipart/form-data,",
+            },
+          });
+
           navigate("/");
         }
       }
