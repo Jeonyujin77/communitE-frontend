@@ -61,8 +61,16 @@ export const __modifyUserInfo = createAsyncThunk(
   async (payload, thunkAPI) => {
     const { userId, formData } = payload;
 
+    console.log(formData.get("image"));
+    console.log(formData.get("nickname"));
     try {
-      const response = await api.put(`/api/user/${userId}`, formData);
+      const response = await api.put(`/api/user/${userId}`, formData, {
+        headers: {
+          "content-type": "multipart/form-data;",
+          accept: "multipart/form-data,",
+          withCredentials: true,
+        },
+      });
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -71,8 +79,6 @@ export const __modifyUserInfo = createAsyncThunk(
 );
 
 // export const userApis = {
-//   // 로그아웃
-//   logout: () => api.put("/api/user/logout", {}),
 //   // 아이디 중복검사
 //   chkLoginIdDup: (loginId) => api.get(`/api/user/signup/${loginId}`),
 //   // 닉네임 중복검사

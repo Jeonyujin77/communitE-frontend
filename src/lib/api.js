@@ -14,7 +14,7 @@ api.interceptors.request.use(function (config) {
   const token = accessToken.split("accessToken=")[1];
 
   if (token !== undefined) {
-    config.headers.common["authorization"] = `${token}`;
+    config.headers.authorization = `Bearer%${token}`;
   }
   return config;
 });
