@@ -20,7 +20,7 @@ const Login = () => {
   // 로그인 되어있으면 메인으로 이동한다.
   useEffect(() => {
     if (is_login) navigate("/");
-  });
+  }, []);
 
   const onSubmit = (event) => {
     event.preventDefault();

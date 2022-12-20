@@ -17,17 +17,17 @@ export const userSlice = createSlice({
       state.is_login = true;
     },
     loginCheck: (state, action) => {
-      const loginId = localStorage.getItem("loginId");
+      const userId = localStorage.getItem("userId");
       const tokenCheck = document.cookie;
       if (tokenCheck) {
-        state.user = { id: loginId };
+        state.user = { id: userId };
         state.is_login = true;
       }
     },
     logout: (state, action) => {
-      deleteCookie("accessToken");
-      deleteCookie("refreshToken");
-      localStorage.removeItem("loginId");
+      deleteCookie("accesstoken");
+      deleteCookie("refreshtoken");
+      localStorage.removeItem("userId");
       state.user = null;
       state.is_login = false;
       window.location.href = "/";
@@ -38,19 +38,13 @@ export const userSlice = createSlice({
       state.is_login = false;
     },
     [__login.fulfilled]: (state, action) => {
-      const { accessToken, refreshToken } = action.payload;
-      const { loginId } = action.meta.arg;
+      const { userId } = action.payload;
 
-      // access token 생성
-      setCookie("accessToken", accessToken, 7);
-      // refresh token 생성
-      setCookie("refreshToken", refreshToken, 7);
-      // localStorage에 loginId 저장
-      localStorage.setItem("loginId", loginId);
+      localStorage.setItem("userId", userId);
       // 로그인여부 true
       state.is_login = true;
       // 사용자정보 저장
-      state.user = { id: loginId };
+      state.user = action.payload;
     },
     [__login.rejected]: (state, action) => {
       state.is_login = false;

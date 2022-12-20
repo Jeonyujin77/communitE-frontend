@@ -1,12 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { setCookie } from "../utils/Cookie";
 import api from "./api";
-
 // 로그인
 export const __login = createAsyncThunk("login", async (payload, thunkAPI) => {
   const { loginId, password } = payload;
   try {
     const response = await api.post("/api/user/login", { loginId, password });
+    const { accesstoken, refreshtoken } = response.headers;
 
+    // access token 생성
+    setCookie("accesstoken", accesstoken, 7);
+    // refresh token 생성
+    setCookie("refreshtoken", refreshtoken, 7);
     return thunkAPI.fulfillWithValue(response.data);
   } catch (error) {
     const { errorMessage } = error.response.data;
