@@ -1,8 +1,22 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { Link } from "../../../node_modules/react-router-dom/dist/index";
+import { logout } from "../../redux/modules/userSlice";
 import { Colors } from "../../styles/colors";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const { user, is_login } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    console.log(user, is_login);
+  });
+
+  const onLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <HeaderContainer>
       <HeaderWrapper>
@@ -11,14 +25,26 @@ const Header = () => {
         </h1>
 
         <MyMenu>
-          <Profile>
-            <img src="https://i.ibb.co/zPcdbH8/pngegg.png" alt="기본프로필" />
-          </Profile>
           <HeaderWords>
-            <Link to="/mypage">
-              <span>닉네임</span>님, 환영합니다!
-            </Link>
-            <Link to="/">로그아웃</Link>
+            {is_login ? (
+              <>
+                <Profile>
+                  <img
+                    src="https://i.ibb.co/zPcdbH8/pngegg.png"
+                    alt="기본프로필"
+                  />
+                </Profile>
+                <Link to="/mypage">
+                  <span>닉네임</span>님, 환영합니다!
+                </Link>
+                <Link onClick={onLogout}>로그아웃</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login">로그인</Link>
+                <Link to="/join">회원가입</Link>
+              </>
+            )}
           </HeaderWords>
         </MyMenu>
       </HeaderWrapper>
