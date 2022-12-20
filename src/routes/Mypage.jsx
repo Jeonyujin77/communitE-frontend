@@ -4,30 +4,15 @@ import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import { Colors } from "../styles/colors";
-import { useDispatch, useSelector } from "react-redux";
-import { __getUserInfo } from "../lib/userApi";
-import { getUserInfo } from "../redux/modules/userSlice";
+import { useSelector } from "react-redux";
+import useAuth from "../hooks/useAuth";
 
 const Mypage = () => {
   const navigate = useNavigate();
-  const { user, is_login } = useSelector((state) => state.user); // 사용자정보 가져오기
-  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
 
-  // 화면이 로드됨과 동시에 사용자정보를 조회한다
-  useEffect(() => {
-    // 로그인한 상태인 경우에만!
-    if (is_login) {
-      const userId = localStorage.getItem("userId");
-      dispatch(__getUserInfo(userId)).then((res) => {
-        // store에 사용자정보 저장
-        const { user } = res.payload;
-        dispatch(getUserInfo(user));
-      });
-    } else {
-      // 로그인 안하고 바로 마이페이지접근 시 로그인페이지로 리다이렉트시킴
-      navigate("/login");
-    }
-  }, [is_login, dispatch, navigate]);
+  // 로그인 확인
+  useAuth();
 
   const onProfileEdit = () => {
     navigate(`/mypagemodify`);

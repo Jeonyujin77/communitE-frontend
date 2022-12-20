@@ -1,37 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/layout/Section";
 import useInput from "../hooks/useInput";
-import { __getUserInfo, __modifyUserInfo } from "../lib/userApi";
-import { getUserInfo } from "../redux/modules/userSlice";
+import { __modifyUserInfo } from "../lib/userApi";
+import useAuth from "../hooks/useAuth";
 
 const MypageEdit = () => {
-  const navigate = useNavigate();
-  const { user, is_login } = useSelector((state) => state.user); // 사용자정보 가져오기
+  const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
   const dispatch = useDispatch();
   const [nickname, nicknameHandler] = useInput(user?.nickname);
   const [imgUrl, setImgUrl] = useState(user?.image);
   const [imgData, setImgData] = useState(null); // image data
 
-  // 화면이 로드됨과 동시에 사용자정보를 조회한다
-  useEffect(() => {
-    // 로그인한 상태인 경우에만!
-    if (is_login) {
-      const userId = localStorage.getItem("userId");
-      dispatch(__getUserInfo(userId)).then((res) => {
-        // store에 사용자정보 저장
-        const { user } = res.payload;
-        dispatch(getUserInfo(user));
-      });
-    } else {
-      // 로그인 안하고 바로 마이페이지접근 시 로그인페이지로 리다이렉트시킴
-      navigate("/login");
-    }
-  }, [is_login, dispatch, navigate]);
+  // 로그인 확인
+  useAuth();
 
   // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = (event) => {
