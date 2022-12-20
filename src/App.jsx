@@ -8,8 +8,18 @@ import WritePage from "./routes/Write";
 import Mypage from "./routes/Mypage";
 import MypageEdit from "./routes/MypageEdit";
 import Layout from "./components/layout/Layout";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { loginCheck } from "./redux/modules/userSlice";
 
 function App() {
+  const dispatch = useDispatch();
+
+  // 앱 로드 시 로그인유무 체크
+  useEffect(() => {
+    dispatch(loginCheck());
+  }, []);
+
   return (
     <Router>
       <Layout>

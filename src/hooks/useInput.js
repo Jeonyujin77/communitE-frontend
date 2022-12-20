@@ -8,7 +8,7 @@ const useInput = (initialState) => {
     },
     [value]
   );
-  return [value, setValue, handler];
+  return [value, handler];
 };
 
 export default useInput;

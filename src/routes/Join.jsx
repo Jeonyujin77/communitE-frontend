@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button";
@@ -11,14 +11,20 @@ import { idCheck, pwCheck } from "../utils/RegExp";
 
 const Join = () => {
   const navigate = useNavigate();
+  const { is_login } = useSelector((state) => state.user); // 사용자정보 가져오기
   const dispatch = useDispatch();
-  const [loginId, setLoginId, loginIdHandler] = useInput(""); // 아이디
-  const [nickname, setNickname, nicknameHandler] = useInput(""); // 닉네임
-  const [password, setPassword, passwordHandler] = useInput(""); // 비밀번호
-  const [confirm, setConfirm, confirmHandler] = useInput(""); // 비밀번호 확인
+  const [loginId, loginIdHandler] = useInput(""); // 아이디
+  const [nickname, nicknameHandler] = useInput(""); // 닉네임
+  const [password, passwordHandler] = useInput(""); // 비밀번호
+  const [confirm, confirmHandler] = useInput(""); // 비밀번호 확인
   const [loginIdValidate, setloginIdValidate] = useState(true); // 아이디 정규식 검증
   const [passwordValidate, setPasswordValidate] = useState(true); // 비밀번호 정규식 검증
   const [confirmValidate, setConfirmValidate] = useState(true); // 비밀번호 확인 검증
+
+  // 로그인한 상태이면 메인으로 리다이렉트시킴
+  useEffect(() => {
+    if (is_login) navigate("/");
+  });
 
   // 아이디 검증
   const validateLoginId = () => {
@@ -48,16 +54,16 @@ const Join = () => {
   };
 
   // 회원가입
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     // 입력값 검증이 정상이면
     if (loginIdValidate && passwordValidate && confirmValidate) {
       dispatch(__signup({ loginId, password, nickname })).then((res) => {
-        const { type } = res;
+        const { type, payload } = res;
 
         // 응답이 정상이면
         if (type === "signup/fulfilled") {
-          alert("회원가입이 정상적으로 되었습니다.");
+          alert(`${payload.message}`);
           navigate("/login");
         }
       });

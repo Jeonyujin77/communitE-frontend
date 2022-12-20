@@ -1,6 +1,20 @@
-import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "./api";
+
+// 로그인
+export const __login = createAsyncThunk("login", async (payload, thunkAPI) => {
+  const { loginId, password } = payload;
+  try {
+    const response = await api.post("/api/user/login", { loginId, password });
+
+    return thunkAPI.fulfillWithValue(response.data);
+  } catch (error) {
+    const { errorMessage } = error.response.data;
+
+    alert(errorMessage);
+    return thunkAPI.rejectWithValue(error);
+  }
+});
 
 // 회원가입
 export const __signup = createAsyncThunk(
@@ -8,13 +22,16 @@ export const __signup = createAsyncThunk(
   async (payload, thunkAPI) => {
     const { loginId, password, nickname } = payload;
     try {
-      const response = await axios.post("http://localhost:3001/user", {
+      const response = await api.post("/api/user/signup", {
         loginId,
         password,
         nickname,
       });
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
+      const { errorMessage } = error.response.data;
+
+      alert(errorMessage);
       return thunkAPI.rejectWithValue(error);
     }
   }
@@ -25,9 +42,7 @@ export const __getUserInfo = createAsyncThunk(
   "getUserInfo",
   async (payload, thunkAPI) => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_URL}/api/user/${payload}`
-      );
+      const response = await api.get(`/api/user/${payload}`);
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -42,10 +57,7 @@ export const __modifyUserInfo = createAsyncThunk(
     const { userId, formData } = payload;
 
     try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_URL}/api/user/${userId}`,
-        formData
-      );
+      const response = await api.put(`/api/user/${userId}`, formData);
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -54,9 +66,6 @@ export const __modifyUserInfo = createAsyncThunk(
 );
 
 // export const userApis = {
-//   // 로그인
-//   login: (loginId, password) =>
-//     api.post("/api/user/login", { loginId, password }),
 //   // 로그아웃
 //   logout: () => api.put("/api/user/logout", {}),
 //   // 아이디 중복검사
