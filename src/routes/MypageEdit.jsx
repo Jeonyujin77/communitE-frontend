@@ -21,7 +21,8 @@ const MypageEdit = () => {
   useEffect(() => {
     // 로그인한 상태인 경우에만!
     if (is_login) {
-      dispatch(__getUserInfo(user?.userId)).then((res) => {
+      const userId = localStorage.getItem("userId");
+      dispatch(__getUserInfo(userId)).then((res) => {
         // store에 사용자정보 저장
         const { user } = res.payload;
         dispatch(getUserInfo(user));
@@ -30,7 +31,7 @@ const MypageEdit = () => {
       // 로그인 안하고 바로 마이페이지접근 시 로그인페이지로 리다이렉트시킴
       navigate("/login");
     }
-  }, []);
+  }, [is_login, dispatch, navigate]);
 
   // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = (event) => {
@@ -72,7 +73,7 @@ const MypageEdit = () => {
       // 응답이 정상이면
       if (type === "modifyUserInfo/fulfilled") {
         alert(`${payload.message}`);
-        navigate("/");
+        window.location.href = "/";
       }
     });
   };

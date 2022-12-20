@@ -2,16 +2,27 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { Link } from "../../../node_modules/react-router-dom/dist/index";
-import { logout } from "../../redux/modules/userSlice";
+import { __getUserInfo } from "../../lib/userApi";
+import { getUserInfo, logout } from "../../redux/modules/userSlice";
 import { Colors } from "../../styles/colors";
 
 const Header = () => {
+  const { user, is_login } = useSelector((state) => state.user); // 사용자정보 가져오기
   const dispatch = useDispatch();
-  const { user, is_login } = useSelector((state) => state.user);
+  const is_token = document.cookie;
 
+  // 화면이 로드됨과 동시에 사용자정보를 조회한다
   useEffect(() => {
-    console.log(user, is_login);
-  });
+    // 로그인한 상태인 경우에만!
+    if (is_login) {
+      const userId = localStorage.getItem("userId");
+      dispatch(__getUserInfo(userId)).then((res) => {
+        // store에 사용자정보 저장
+        const { user } = res.payload;
+        dispatch(getUserInfo(user));
+      });
+    }
+  }, [is_login, dispatch]);
 
   const onLogout = () => {
     dispatch(logout());
@@ -23,19 +34,15 @@ const Header = () => {
         <h1>
           <Link to="/">Communit-E</Link>
         </h1>
-
         <MyMenu>
           <HeaderWords>
-            {is_login ? (
+            {is_token ? (
               <>
                 <Profile>
-                  <img
-                    src="https://i.ibb.co/zPcdbH8/pngegg.png"
-                    alt="기본프로필"
-                  />
+                  <img src={`${user?.image}`} alt="프로필" />
                 </Profile>
                 <Link to="/mypage">
-                  <span>닉네임</span>님, 환영합니다!
+                  <span>{user?.nickname}</span>님, 환영합니다!
                 </Link>
                 <Link onClick={onLogout}>로그아웃</Link>
               </>
