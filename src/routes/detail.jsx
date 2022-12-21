@@ -28,6 +28,7 @@ const CommentToggle = ({ desc, inputActive, inputValueState }) => {
   const writeComment = ({ target: { value } }) => {
     setInputValue(value);
   };
+
   return (
     <CommentRight inputActive={inputActive}>
       <div className="commentDesc">{desc}</div>
@@ -163,14 +164,34 @@ const DetailPage = () => {
   };
 
   // 댓글 등록
+  const isLogined = document.cookie;
   const commentPost = async () => {
     //넣을 새 댓글
-    const newComment = {
-      content: wroteComment,
-    };
-    dispatch(__postCommentsData({ params: params, newComment: newComment }));
-    setwroteComment("");
+    if (!isLogined) {
+      alert("댓글을 입력하시려면 로그인을 해주세요.");
+    } else if (!wroteComment) {
+      alert("댓글을 입력해주세요.");
+    } else {
+      const newComment = {
+        content: wroteComment,
+      };
+      dispatch(__postCommentsData({ params: params, newComment: newComment }));
+      setwroteComment("");
+    }
   };
+
+  const [areaDisabled, setAreaDisabled] = useState(false);
+  const [explainPlaceHolder, setExplainPlaceHolder] =
+    useState("댓글을 입력해주세요.");
+  useEffect(() => {
+    if (!isLogined) {
+      setAreaDisabled(true);
+      setExplainPlaceHolder("로그인이 필요합니다.");
+    } else {
+      setAreaDisabled(false);
+      setExplainPlaceHolder("댓글을 입력해주세요.");
+    }
+  }, []);
 
   return (
     <>
@@ -211,7 +232,12 @@ const DetailPage = () => {
               등록
             </Button>
           </div>
-          <textarea onChange={setCommentDesc} value={wroteComment}></textarea>
+          <textarea
+            onChange={setCommentDesc}
+            value={wroteComment}
+            disabled={areaDisabled}
+            placeholder={explainPlaceHolder}
+          ></textarea>
         </CommentInputWrap>
         {commentList.length === 0 ? (
           <ZeroCommentMessage>아직 댓글이 없습니다</ZeroCommentMessage>
@@ -351,6 +377,8 @@ const CommentRight = styled.div`
   width: 100%;
   .commentDesc {
     display: ${({ inputActive }) => (inputActive ? "none" : "block")};
+    white-space: pre-wrap;
+    word-break: break-word;
   }
   .commentInput {
     display: ${({ inputActive }) => (inputActive ? "block" : "none")};

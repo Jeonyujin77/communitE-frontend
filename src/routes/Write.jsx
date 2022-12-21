@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "../../node_modules/axios/index";
-import { useDispatch } from "../../node_modules/react-redux/es/exports";
+import {
+  useDispatch,
+  useSelector,
+} from "../../node_modules/react-redux/es/exports";
 import {
   useNavigate,
   useParams,
@@ -9,6 +12,7 @@ import {
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import api from "../lib/api";
+import { __getUserPosts } from "../lib/postApi";
 import { __postPostData, __putPostData } from "../redux/modules/postSlice";
 
 const WritePage = () => {
@@ -24,6 +28,7 @@ const WritePage = () => {
   //제목, 내용 state
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+  const [usersId, setUsersId] = useState("");
 
   //error 메시지 state
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,10 +41,11 @@ const WritePage = () => {
   const getPostedData = async () => {
     const {
       data: { post },
-    } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${params}`);
+    } = await api.get(`/api/posts/${params}`);
     setTitle(post.title);
     setDesc(post.content);
     setImgUrl(post.image);
+    setUsersId(post.userId);
   };
   //params가 들어온다면 state의 초기값을 지정
   useEffect(() => {
@@ -125,6 +131,17 @@ const WritePage = () => {
   const errRemove = () => {
     setErrorMessage("");
   };
+  // ----------------------------------------------------------------------
+  //url로 입장해도 token 검사를 실행하여, 로그인이 안되어있으면 다시 메인 페이지로 리다이렉트
+  useEffect(() => {
+    //토큰으로 로그인 유무 판단
+    const is_token = document.cookie;
+    if (usersId) {
+      if (!is_token || usersId.toString() !== localStorage.getItem("userId")) {
+        navigate("/");
+      }
+    }
+  }, [usersId]);
   return (
     <>
       <Section>
