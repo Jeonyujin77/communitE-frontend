@@ -61,8 +61,6 @@ export const __modifyUserInfo = createAsyncThunk(
   async (payload, thunkAPI) => {
     const { userId, formData } = payload;
 
-    console.log(formData.get("image"));
-    console.log(formData.get("nickname"));
     try {
       const response = await api.put(`/api/user/${userId}`, formData, {
         headers: {

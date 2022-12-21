@@ -24,7 +24,7 @@ const Join = () => {
   // 로그인한 상태이면 메인으로 리다이렉트시킴
   useEffect(() => {
     if (is_login) navigate("/");
-  });
+  }, [is_login, navigate]);
 
   // 아이디 검증
   const validateLoginId = () => {
