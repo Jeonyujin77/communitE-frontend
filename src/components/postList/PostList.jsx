@@ -57,11 +57,13 @@ const PostComtent = styled.div`
     font-size: 25px;
     margin-bottom: 10px;
     font-weight: bold;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .postNickname {
     margin-bottom: 5px;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }

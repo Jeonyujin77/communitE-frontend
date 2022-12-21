@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "../../node_modules/axios/index";
 import {
   useDispatch,
   useSelector,
@@ -12,13 +11,15 @@ import {
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import {
-  getPostData,
-  __deletePostData,
-  __getPostData,
-} from "../redux/modules/postSlice";
+  __deleteCommentsData,
+  __getCommentsData,
+  __postCommentsData,
+  __putCommentsData,
+} from "../redux/modules/commentSlice";
+import { __deletePostData, __getPostData } from "../redux/modules/postSlice";
 
-const CommentToggle = ({ desc, inputActive }) => {
-  const [inputValue, setInputValue] = useState("");
+const CommentToggle = ({ desc, inputActive, inputValueState }) => {
+  const [inputValue, setInputValue] = inputValueState;
 
   useEffect(() => {
     setInputValue(desc);
@@ -39,27 +40,46 @@ const CommentToggle = ({ desc, inputActive }) => {
     </CommentRight>
   );
 };
-const CommentComponent = ({ list: { nickname, desc } }) => {
+const CommentComponent = ({
+  list: { commentId, nickname, content, userId, createdAt },
+  params,
+}) => {
+  const dispatch = useDispatch();
   const [inputActive, setInputActive] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   // commentDesc창 토글
   const commentToggle = () => {
     setInputActive(!inputActive);
   };
   // 댓글 삭제
-  const commentDelete = () => {
-    console.log("댓글 삭제");
+  const commentDelete = async () => {
+    if (window.confirm("삭제하시겠습니까?")) {
+      dispatch(__deleteCommentsData({ params: params, commentId: commentId }));
+    }
   };
   // 댓글 수정
-  const commentRetouch = () => {
-    console.log("댓글 수정");
+  const commentRetouch = async () => {
+    const retouchedComment = {
+      content: inputValue,
+    };
+
+    dispatch(
+      __putCommentsData({
+        params: params,
+        commentId: commentId,
+        retouchedComment: retouchedComment,
+      })
+    );
+
     setInputActive(!inputActive);
   };
   return (
     <>
       <CommentsWrap>
-        <CommentLeft>
+        <CommentLeft userId={userId}>
           <div className="commentNickname">{nickname}</div>
+          <div className="commentCreated">{createdAt}</div>
           <div className="commentBtnWrap">
             {inputActive ? (
               <>
@@ -82,7 +102,11 @@ const CommentComponent = ({ list: { nickname, desc } }) => {
             )}
           </div>
         </CommentLeft>
-        <CommentToggle desc={desc} inputActive={inputActive} />
+        <CommentToggle
+          desc={content}
+          inputValueState={[inputValue, setInputValue]}
+          inputActive={inputActive}
+        />
       </CommentsWrap>
     </>
   );
@@ -121,40 +145,17 @@ const DetailPage = () => {
   // --------------------------------------------------------------------
   const [wroteComment, setwroteComment] = useState("");
 
-  //임시 댓글
-  const [commentList, setCommentList] = useState([
-    {
-      id: 1,
-      nickname: "로이어드",
-      desc: "인간의 우리의 이상은 하는 힘차게 봄바람이다. 구하기 구하지 눈이 가는 있다.",
-    },
-    {
-      id: 2,
-      nickname: "로이어드",
-      desc: "청춘은 웅대한 스며들어 평화스러운 오직 쓸쓸하랴?",
-    },
-    {
-      id: 3,
-      nickname: "로이어드",
-      desc: " 같이, 뜨고, 용기가얼마나청춘의청춘의사막이다.",
-    },
-    {
-      id: 4,
-      nickname: "로이어드",
-      desc: "찬미를 위하여 그들은 열매를 되는 길지 교향악이다",
-    },
-  ]);
+  //댓글 리스트
+  const commentListed = useSelector((state) => state.comments.comments);
 
   // 댓글 리스트 불러오기
-  // const getComments = async () => {
-  //   const { data } = await axios.get(
-  //     `${process.env.REACT_APP_URL}/api/post/${params}/comments`
-  //   );
-  //   console.log(data);
-  // };
-  // useEffect(() => {
-  //   getComments();
-  // }, []);
+  useEffect(() => {
+    dispatch(__getCommentsData(params));
+  }, [dispatch]);
+
+  //최신순 정리
+  let commentList = [...commentListed];
+  commentList = [...commentList.sort((a, b) => b.commentId - a.commentId)];
 
   //댓글 작성
   const setCommentDesc = ({ target: { value } }) => {
@@ -162,19 +163,15 @@ const DetailPage = () => {
   };
 
   // 댓글 등록
-  const commentPost = () => {
+  const commentPost = async () => {
     //넣을 새 댓글
     const newComment = {
-      id: Date.now(),
-      nickname: "로이어드",
-      desc: wroteComment,
+      content: wroteComment,
     };
-    setCommentList([newComment, ...commentList]);
+    dispatch(__postCommentsData({ params: params, newComment: newComment }));
     setwroteComment("");
   };
-  useEffect(() => {
-    setCommentList(commentList.sort((a, b) => b.id - a.id));
-  }, []);
+
   return (
     <>
       <DetailTop userId={String(post.userId)}>
@@ -216,9 +213,17 @@ const DetailPage = () => {
           </div>
           <textarea onChange={setCommentDesc} value={wroteComment}></textarea>
         </CommentInputWrap>
-        {commentList.map((list) => (
-          <CommentComponent key={list.id} list={list} />
-        ))}
+        {commentList.length === 0 ? (
+          <ZeroCommentMessage>아직 댓글이 없습니다</ZeroCommentMessage>
+        ) : (
+          commentList.map((list) => (
+            <CommentComponent
+              key={list.commentId}
+              params={params}
+              list={list}
+            />
+          ))
+        )}
       </CommentWrap>
     </>
   );
@@ -265,7 +270,7 @@ const PostImg = styled.div`
     height: 100%;
     backdrop-filter: blur(10px);
     background-image: Url(${({ mainImg }) => mainImg});
-    background-size: ${({ fullView }) => (fullView ? "contain" : "cover")};
+    background-size: ${({ fullView }) => (fullView ? "cover" : "contain")};
     background-position: center;
     background-repeat: no-repeat;
     border-radius: 10px;
@@ -281,6 +286,7 @@ const PostContent = styled.div`
 `;
 const CommentWrap = styled.div`
   width: 100%;
+  min-height: 500px;
 `;
 const CommentInputWrap = styled.div`
   margin: 20px 0;
@@ -317,13 +323,27 @@ const CommentsWrap = styled.div`
     border: none;
   }
 `;
+const ZeroCommentMessage = styled.div`
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+`;
 const CommentLeft = styled.div`
   width: 200px;
   .commentNickname {
+    font-weight: bold;
+  }
+  .commentCreated {
+    font-size: 15px;
     margin-bottom: 10px;
+    color: #939393;
   }
   .commentBtnWrap {
-    display: flex;
+    display: ${({ userId }) =>
+      String(userId) === localStorage.getItem("userId") ? "flex" : "none"};
   }
 `;
 const CommentRight = styled.div`
