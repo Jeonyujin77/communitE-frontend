@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "../../node_modules/axios/index";
 import {
   useDispatch,
   useSelector,
@@ -13,7 +12,11 @@ import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import api from "../lib/api";
 import { __getUserPosts } from "../lib/postApi";
-import { __postPostData, __putPostData } from "../redux/modules/postSlice";
+import {
+  __getPostsData,
+  __postPostData,
+  __putPostData,
+} from "../redux/modules/postSlice";
 
 const WritePage = () => {
   const params = useParams().id;
@@ -39,15 +42,23 @@ const WritePage = () => {
   // ------------------------------------------------------------------
   //params를 통해 초기값을 가져옴
   const getPostedData = async () => {
-    const {
-      data: { post },
-    } = await api.get(`/api/posts/${params}`);
-    setTitle(post.title);
-    setDesc(post.content);
-    setImgUrl(post.image);
-    setUsersId(post.userId);
+    try {
+      const {
+        data: { post },
+      } = await api.get(`/api/posts/${params}`);
+      setTitle(post.title);
+      setDesc(post.content);
+      setImgUrl(post.image);
+      setUsersId(post.userId);
+    } catch (err) {
+      if (err.response.status === 404) {
+        alert("존재하지 않는 파일입니다.");
+        navigate("/");
+      }
+    }
   };
-  //params가 들어온다면 state의 초기값을 지정
+
+  //params가 allposts에 없으면 mainPage로 리다이렉트, 있으면 post정보를 가져옴
   useEffect(() => {
     if (params) {
       getPostedData();
@@ -136,6 +147,7 @@ const WritePage = () => {
   useEffect(() => {
     //토큰으로 로그인 유무 판단
     const is_token = document.cookie;
+
     if (usersId) {
       if (!is_token || usersId.toString() !== localStorage.getItem("userId")) {
         navigate("/");
