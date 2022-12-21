@@ -82,9 +82,21 @@ export const __modifyUserInfo = createAsyncThunk(
   }
 );
 
-// export const userApis = {
-//   // 아이디 중복검사
-//   chkLoginIdDup: (loginId) => api.get(`/api/user/signup/${loginId}`),
-//   // 닉네임 중복검사
-//   chkNicknameDup: (nickname) => api.get(`/api/user/signup/${nickname}`),
-// };
+// 아이디, 닉네임 중복검사
+export const __checkDuplicate = createAsyncThunk(
+  "checkDuplicate",
+  async (payload, thunkAPI) => {
+    const text = payload;
+
+    try {
+      const response = await api.get(`/api/user/signup/${text}`);
+
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      const { errorMessage } = error.response.data;
+
+      alert(errorMessage);
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
