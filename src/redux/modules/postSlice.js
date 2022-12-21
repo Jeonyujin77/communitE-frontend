@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../../node_modules/axios/index";
 import api from "../../lib/api";
 
 const initialState = {
@@ -31,7 +30,47 @@ export const __getPostData = createAsyncThunk(
     try {
       const {
         data: { post },
-      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts/${payload}`);
+      } = await api.get(`/api/posts/${payload}`);
+      return thunkAPI.fulfillWithValue(post);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  }
+);
+// 게시물 생성
+export const __postPostData = createAsyncThunk(
+  "postPost",
+  async (payload, thunkAPI) => {
+    try {
+      await api.post(`/api/posts`, payload, {
+        headers: {
+          "content-type": "multipart/form-data",
+          accept: "multipart/form-data,",
+        },
+      });
+      const {
+        data: { posts },
+      } = await api.get(`/api/posts/`);
+      return thunkAPI.fulfillWithValue(posts);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  }
+);
+// 게시물 수정
+export const __putPostData = createAsyncThunk(
+  "putPost",
+  async ({ params, formData }, thunkAPI) => {
+    try {
+      await api.put(`/api/posts/${params}`, formData, {
+        headers: {
+          "content-type": "multipart/form-data",
+          accept: "multipart/form-data,",
+        },
+      });
+      const {
+        data: { post },
+      } = await api.get(`/api/posts/${params}`);
       return thunkAPI.fulfillWithValue(post);
     } catch (err) {
       return thunkAPI.rejectWithValue(err);
@@ -85,6 +124,34 @@ export const postSlice = createSlice({
         state.post = payload;
       })
       .addCase(__getPostData.rejected, (state, { payload }) => {
+        state.isLoading = false;
+        state.error = payload;
+      })
+      // -----------------------------------------------------------------
+      // __postPostData
+      .addCase(__postPostData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(__postPostData.fulfilled, (state, { payload }) => {
+        state.isLoading = false;
+        state.posts = payload;
+      })
+      .addCase(__postPostData.rejected, (state, { payload }) => {
+        state.isLoading = false;
+        state.error = payload;
+      })
+      // -----------------------------------------------------------------
+      // __putPostData
+      .addCase(__putPostData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(__putPostData.fulfilled, (state, { payload }) => {
+        state.isLoading = false;
+        state.post = payload;
+      })
+      .addCase(__putPostData.rejected, (state, { payload }) => {
         state.isLoading = false;
         state.error = payload;
       })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "../../node_modules/axios/index";
-import arrayIncludes from "../../node_modules/lodash/_arrayIncludes";
+import { useDispatch } from "../../node_modules/react-redux/es/exports";
 import {
   useNavigate,
   useParams,
@@ -9,15 +9,16 @@ import {
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
 import api from "../lib/api";
+import { __postPostData, __putPostData } from "../redux/modules/postSlice";
 
 const WritePage = () => {
   const params = useParams().id;
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 제목, 내용 길이 제한 || 이미지 용량, 형식 제한
   const titleLength = 50;
-  const descLength = 3000;
-  const ImgVolume = "500MB";
+  const ImgVolume = 5000000;
   const imgType = ["image/jpg", "image/jpeg", "image/png"];
 
   //제목, 내용 state
@@ -57,8 +58,12 @@ const WritePage = () => {
 
   // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = ({ target: { files } }) => {
-    if (!imgType.includes(files[0].type)) {
+    if (!files[0]) {
+      return;
+    } else if (!imgType.includes(files[0].type)) {
       alert("파일 형식이 잘못되었습니다.");
+    } else if (files[0].size > ImgVolume) {
+      alert("이미지파일의 최대 용량을 초과하였습니다.");
     } else {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(files[0]);
@@ -95,18 +100,14 @@ const WritePage = () => {
       if (params) {
         if (window.confirm("수정하시겠습니까?")) {
           // params가 있을 경우 put 요청 후 해당 페이지로 이동
-          await api.put(`/api/posts/${params}`, formData, {
-            headers: {
-              "content-type": "multipart/form-data",
-              accept: "multipart/form-data,",
-            },
-          });
+          dispatch(__putPostData({ params: params, formData: formData }));
 
           navigate(`/post/${params}`);
         }
       } else {
         if (window.confirm("등록하시겠습니까?")) {
           // 없으면 post 요청 후 메인 페이지로 이동
+          // dispatch(__postPostData(formData));
           await api.post(`/api/posts`, formData, {
             headers: {
               "content-type": "multipart/form-data",
@@ -127,7 +128,11 @@ const WritePage = () => {
   return (
     <>
       <Section>
-        <WriteTdp>nickname님의 새로운 글입니다!</WriteTdp>
+        {params ? (
+          <WriteTdp>게시물 수정하기</WriteTdp>
+        ) : (
+          <WriteTdp>게시물 작성하기</WriteTdp>
+        )}
       </Section>
       <WriteWrap>
         <label>제목</label>
@@ -148,13 +153,12 @@ const WritePage = () => {
       <WriteWrap>
         <label>내용</label>
         <textarea
-          maxLength={descLength}
           onChange={writeDesc}
           onFocus={errRemove}
           value={desc}
         ></textarea>
         <ul className="inputExplain">
-          <li>내용은 1자 이상, {descLength}자 이하로 입력해 주세요.</li>
+          <li>내용은 1자 이상 입력해 주세요.</li>
           <li>
             적절하지 않다고 판단되는 비속어, 성적인 컨텐츠 등이 있을 경우,
             게시물이 삭제될 수 있습니다.
@@ -184,7 +188,9 @@ const WritePage = () => {
           remove
         </Button>
         <ul className="inputExplain">
-          <li>이미지의 용량은 {ImgVolume} 이하로 업로드 해주세요. </li>
+          <li>
+            이미지의 용량은 {ImgVolume / 1000000}MB 이하로 업로드 해주세요.{" "}
+          </li>
           <li>
             적절하지 않다고 판단되는 비속어, 성적인 컨텐츠 등이 있을 경우,
             게시물이 삭제될 수 있습니다.
@@ -200,7 +206,7 @@ const WritePage = () => {
             height={"50px"}
             fontSize={"20px"}
           >
-            등록하기
+            작성하기
           </Button>
         </SubmitContainer>
       </Section>
