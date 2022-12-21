@@ -1,22 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/layout/Section";
-import { __checkDuplicate, __modifyUserInfo } from "../lib/userApi";
+import {
+  __checkDuplicate,
+  __getUserInfo,
+  __modifyUserInfo,
+} from "../lib/userApi";
 import useAuth from "../hooks/useAuth";
+import { getUserInfo } from "../redux/modules/userSlice";
 
 const MypageEdit = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
-  const [nickname, setNickname] = useState(user?.nickname); // 닉네임
-  const [imgUrl, setImgUrl] = useState(user?.image); // 프로필 이미지
+  const [nickname, setNickname] = useState(""); // 닉네임
+  const [imgUrl, setImgUrl] = useState(""); // 프로필 이미지
   const [imgData, setImgData] = useState(null); // 이미지 데이터
+  const ImgVolume = 5000000; // 이미지 최대 크기
+  const imgType = ["image/jpg", "image/jpeg", "image/png"]; // 업로드 가능한 파일 확장자
   const [checkNickDup, setCheckNickDup] = useState(true); // 닉네임 중복 검증
+  const userId = localStorage.getItem("userId");
 
   // 로그인 확인
   useAuth();
+
+  // S: 새로고침한 경우 사용자 정보 초기화되는 문제땜에 추가
+  useEffect(() => {
+    if (user === null) {
+      dispatch(__getUserInfo(userId)).then((res) => {
+        // store에 사용자정보 저장
+        const { user } = res.payload;
+        dispatch(getUserInfo(user));
+      });
+    }
+  }, [user, dispatch, userId]);
+
+  useEffect(() => {
+    if (user !== null) {
+      // 닉네임, 이미지 재설정
+      setNickname(user.nickname);
+      setImgUrl(user.image);
+    }
+  }, [user]);
+  // E: 새로고침한 경우 사용자 정보 초기화되는 문제땜에 추가
 
   // 닉네임 입력 시
   const onChangeNickname = (e) => {
@@ -26,15 +54,23 @@ const MypageEdit = () => {
 
   // 이미지 미리보기, blob데이터를 state에 저장
   const writeImgUrl = (event) => {
-    const reader = new FileReader();
     const file = event.target.files[0];
 
     if (file) {
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        setImgUrl(reader.result);
-      };
-      setImgData(file);
+      if (!imgType.includes(file.type)) {
+        alert("파일 형식이 잘못되었습니다.");
+        document.getElementById("profileImg").value = "";
+      } else if (file.size > ImgVolume) {
+        alert("이미지파일의 최대 용량을 초과하였습니다.");
+        document.getElementById("profileImg").value = "";
+      } else {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          setImgUrl(reader.result);
+        };
+        setImgData(file);
+      }
     }
   };
 
@@ -98,7 +134,12 @@ const MypageEdit = () => {
         <form onSubmit={onSubmit}>
           <Row>
             {imgUrl !== null ? (
-              <img id="preview" alt="미리보기" src={imgUrl} width="100px" />
+              <img
+                id="preview"
+                alt="미리보기"
+                src={imgUrl || ""}
+                width="100px"
+              />
             ) : (
               ""
             )}
@@ -107,7 +148,7 @@ const MypageEdit = () => {
             <Input
               id="profileImg"
               type="file"
-              accept=".jpg, .png"
+              accept=".jpg, .png, .jpeg"
               width="350px"
               onChange={writeImgUrl}
             />
@@ -118,7 +159,7 @@ const MypageEdit = () => {
             <Input
               type="text"
               width="350px"
-              value={nickname}
+              value={nickname || ""}
               onChange={onChangeNickname}
               required
             />

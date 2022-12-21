@@ -33,6 +33,7 @@ function App() {
           <Route exact path="/post/:id" element={<DetailPage />} />
           <Route exact path="/write" element={<WritePage />} />
           <Route exact path="/edit/:id" element={<WritePage />} />
+          <Route path="/*" element={<Home />} />
         </Routes>
       </Layout>
     </Router>

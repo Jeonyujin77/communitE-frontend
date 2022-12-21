@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { Link } from "../../../node_modules/react-router-dom/dist/index";
+import {
+  Link,
+  useNavigate,
+} from "../../../node_modules/react-router-dom/dist/index";
 import { __getUserInfo } from "../../lib/userApi";
 import { getUserInfo, logout } from "../../redux/modules/userSlice";
 import { Colors } from "../../styles/colors";
@@ -10,19 +13,21 @@ const Header = () => {
   const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
   const dispatch = useDispatch();
   const is_token = document.cookie;
+  const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
 
   // 화면이 로드됨과 동시에 사용자정보를 조회한다
+
   useEffect(() => {
     // 로그인한 상태인 경우에만!
-    if (is_token !== "") {
-      const userId = localStorage.getItem("userId");
+    if (is_token !== "" && userId !== null) {
       dispatch(__getUserInfo(userId)).then((res) => {
         // store에 사용자정보 저장
         const { user } = res.payload;
         dispatch(getUserInfo(user));
       });
     }
-  }, [is_token, dispatch]);
+  }, [is_token, dispatch, userId, navigate]);
 
   const onLogout = () => {
     dispatch(logout());
@@ -36,7 +41,7 @@ const Header = () => {
         </h1>
         <MyMenu>
           <HeaderWords>
-            {is_token !== "" ? (
+            {is_token !== "" && userId !== "" ? (
               <>
                 <Profile>
                   {user?.image !== null ? (
