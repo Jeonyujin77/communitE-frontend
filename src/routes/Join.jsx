@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button";
@@ -11,7 +11,7 @@ import { idCheck, pwCheck } from "../utils/RegExp";
 
 const Join = () => {
   const navigate = useNavigate();
-  const { is_login } = useSelector((state) => state.user); // 사용자정보 가져오기
+  const is_token = document.cookie;
   const dispatch = useDispatch();
   const [loginId, loginIdHandler] = useInput(""); // 아이디
   const [nickname, nicknameHandler] = useInput(""); // 닉네임
@@ -23,8 +23,8 @@ const Join = () => {
 
   // 로그인한 상태이면 메인으로 리다이렉트시킴
   useEffect(() => {
-    if (is_login) navigate("/");
-  }, [is_login, navigate]);
+    if (is_token !== "") navigate("/");
+  }, [is_token, navigate]);
 
   // 아이디 검증
   const validateLoginId = () => {
