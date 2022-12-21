@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../components/common/Button";
@@ -12,15 +12,17 @@ import { Colors } from "../styles/colors";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { is_login } = useSelector((state) => state.user);
+  const is_token = document.cookie;
   const dispatch = useDispatch();
   const [loginId, loginIdHandler] = useInput(""); // 아이디
   const [password, passwordHandler] = useInput(""); // 비밀번호
 
   // 로그인 되어있으면 메인으로 이동한다.
   useEffect(() => {
-    if (is_login) navigate("/");
-  }, [is_login, navigate]);
+    if (is_token) {
+      navigate("/");
+    }
+  }, [is_token, navigate]);
 
   const onSubmit = (event) => {
     event.preventDefault();
