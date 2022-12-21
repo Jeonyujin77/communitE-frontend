@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../node_modules/axios/index";
+import api from "../../lib/api";
 
 const initialState = {
   posts: [],
@@ -16,7 +17,7 @@ export const __getPostsData = createAsyncThunk(
     try {
       const {
         data: { posts },
-      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts`);
+      } = await api.get(`/api/posts`);
       return thunkAPI.fulfillWithValue(posts);
     } catch (err) {
       return thunkAPI.rejectWithValue(err);
@@ -42,11 +43,11 @@ export const __deletePostData = createAsyncThunk(
   "deletePost",
   async (payload, thunkAPI) => {
     try {
-      const { data } = await axios.delete(
-        `${process.env.REACT_APP_URL}/api/posts/${payload}`
-      );
-      console.log(data);
-      return thunkAPI.fulfillWithValue(data);
+      await api.delete(`/api/posts/${payload}`);
+      const {
+        data: { posts },
+      } = await api.get(`/api/posts`);
+      return thunkAPI.fulfillWithValue(posts);
     } catch (err) {
       return thunkAPI.rejectWithValue(err);
     }
@@ -93,8 +94,9 @@ export const postSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(__deletePostData.fulfilled, (state) => {
+      .addCase(__deletePostData.fulfilled, (state, { payload }) => {
         state.isLoading = false;
+        state.posts = payload;
       })
       .addCase(__deletePostData.rejected, (state, { payload }) => {
         state.isLoading = false;

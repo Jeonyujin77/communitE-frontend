@@ -175,10 +175,9 @@ const DetailPage = () => {
   useEffect(() => {
     setCommentList(commentList.sort((a, b) => b.id - a.id));
   }, []);
-
   return (
     <>
-      <DetailTop userId={post.userId}>
+      <DetailTop userId={String(post.userId)}>
         <div>
           <div className="postTitle">{post.title}</div>
           <div className="postNickname">{post.nickname}</div>

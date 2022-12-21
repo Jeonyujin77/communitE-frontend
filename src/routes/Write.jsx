@@ -95,17 +95,19 @@ const WritePage = () => {
       if (params) {
         if (window.confirm("수정하시겠습니까?")) {
           // params가 있을 경우 put 요청 후 해당 페이지로 이동
-          await axios.put(
-            `${process.env.REACT_APP_URL}/api/posts/${params}`,
-            formData
-          );
+          await api.put(`/api/posts/${params}`, formData, {
+            headers: {
+              "content-type": "multipart/form-data",
+              accept: "multipart/form-data,",
+            },
+          });
 
           navigate(`/post/${params}`);
         }
       } else {
         if (window.confirm("등록하시겠습니까?")) {
           // 없으면 post 요청 후 메인 페이지로 이동
-          await api.post(`${process.env.REACT_APP_URL}/api/posts`, formData, {
+          await api.post(`/api/posts`, formData, {
             headers: {
               "content-type": "multipart/form-data",
               accept: "multipart/form-data,",
