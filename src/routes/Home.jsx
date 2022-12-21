@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 
-import { getPostsData } from "../redux/modules/postSlice";
+import { __getPostsData } from "../redux/modules/postSlice";
 
 // component
 import PostListContainer from "../components/postList/PostList";
@@ -13,8 +13,6 @@ import {
   useSelector,
 } from "../../node_modules/react-redux/es/exports";
 
-import axios from "../../node_modules/axios/index";
-
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,24 +21,21 @@ const Home = () => {
     navigate("/write");
   };
 
-  const getPost = async () => {
-    try {
-      const {
-        data: { posts },
-      } = await axios.get(`${process.env.REACT_APP_URL}/api/posts`);
-      dispatch(getPostsData(posts));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  //redux의 posts 소환
   const posts = useSelector((state) => state.posts.posts);
+
+  //처음 랜더링 시 posts에 데이터 삽입
   useEffect(() => {
-    getPost();
-  }, []);
+    dispatch(__getPostsData());
+  }, [dispatch]);
+
+  // 로그인 유무에 따라 버튼 display 변경
+  const isLogined = useSelector((state) => state.user.is_login);
+
   return (
     <>
       <Section>
-        <ListAddBtnWrap>
+        <ListAddBtnWrap isLogined={isLogined}>
           <Button
             onClick={goToWrite}
             width={"200px"}
@@ -59,8 +54,7 @@ const Home = () => {
 };
 
 const ListAddBtnWrap = styled.div`
-  display: block;
-  display: flex;
+  display: ${({ isLogined }) => (isLogined ? "flex" : "none")};
   align-items: center;
   justify-content: right;
 `;
