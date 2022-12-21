@@ -94,8 +94,6 @@ const Join = () => {
   const onSubmit = async (event) => {
     event.preventDefault();
 
-    console.log(checkIdDup, checkNickDup);
-
     if (
       loginIdValidate && // 아이디값이 유효하고
       passwordValidate && // 비밀번호값이 유효하고
