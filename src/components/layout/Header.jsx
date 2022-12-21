@@ -39,7 +39,14 @@ const Header = () => {
             {is_token ? (
               <>
                 <Profile>
-                  <img src={`${user?.image}`} alt="프로필" />
+                  {user?.image !== null ? (
+                    <img src={`${user?.image}`} alt="프로필" />
+                  ) : (
+                    <img
+                      src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                      alt="기본프로필"
+                    />
+                  )}
                 </Profile>
                 <Link to="/mypage">
                   <span>{user?.nickname}</span>님, 환영합니다!
