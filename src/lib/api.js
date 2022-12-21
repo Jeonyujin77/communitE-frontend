@@ -11,10 +11,13 @@ const api = axios.create({
 
 api.interceptors.request.use(function (config) {
   const accessToken = document.cookie.split(";")[0];
-  const token = accessToken.split("accesstoken=")[1];
+  const refreshToken = document.cookie.split(";")[1];
 
-  if (token !== undefined) {
-    config.headers.authorization = `${token}`;
+  if (accessToken !== undefined && refreshToken !== undefined) {
+    const access = accessToken.split("accessToken=")[1];
+    const refresh = refreshToken.split("refreshToken=")[1];
+    config.headers.access = `${access}`;
+    config.headers.refresh = `${refresh}`;
   }
   return config;
 });

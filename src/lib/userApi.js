@@ -4,14 +4,14 @@ import api from "./api";
 // 로그인
 export const __login = createAsyncThunk("login", async (payload, thunkAPI) => {
   const { loginId, password } = payload;
+
   try {
     const response = await api.post("/api/user/login", { loginId, password });
     const { accesstoken, refreshtoken } = response.headers;
-
     // access token 생성
-    setCookie("accesstoken", accesstoken, 7);
+    setCookie("accessToken", accesstoken, 7);
     // refresh token 생성
-    setCookie("refreshtoken", refreshtoken, 7);
+    setCookie("refreshToken", refreshtoken, 7);
     return thunkAPI.fulfillWithValue(response.data);
   } catch (error) {
     const { errorMessage } = error.response.data;
@@ -50,6 +50,9 @@ export const __getUserInfo = createAsyncThunk(
       const response = await api.get(`/api/user/${payload}`);
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
+      const { errorMessage } = error.response.data;
+
+      alert(errorMessage);
       return thunkAPI.rejectWithValue(error);
     }
   }
@@ -71,6 +74,9 @@ export const __modifyUserInfo = createAsyncThunk(
       });
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
+      const { errorMessage } = error.response.data;
+
+      alert(errorMessage);
       return thunkAPI.rejectWithValue(error);
     }
   }
