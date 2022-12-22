@@ -41,7 +41,7 @@ const Header = () => {
         </h1>
         <MyMenu>
           <HeaderWords>
-            {is_token !== "" && userId !== "" ? (
+            {is_token !== "" && userId !== null ? (
               <>
                 <Profile>
                   {user?.image !== null ? (
