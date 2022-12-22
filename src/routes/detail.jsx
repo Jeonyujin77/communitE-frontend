@@ -165,10 +165,6 @@ const DetailPage = () => {
     dispatch(__getCommentsData(params));
   }, [dispatch]);
 
-  //최신순 정리
-  let commentList = [...commentListed];
-  commentList = [...commentList.sort((a, b) => b.commentId - a.commentId)];
-
   //댓글 작성
   const setCommentDesc = ({ target: { value } }) => {
     setwroteComment(value);
