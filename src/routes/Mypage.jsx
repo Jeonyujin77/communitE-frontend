@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
 import PostListContainer from "../components/postList/PostList";
 import { __getUserPosts } from "../lib/postApi";
+import { logout } from "../redux/modules/userSlice";
 
 const Mypage = () => {
   const navigate = useNavigate();
@@ -23,13 +24,15 @@ const Mypage = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      dispatch(__getUserPosts(user?.userId)).then((res) => {
+    if (user !== null) {
+      dispatch(__getUserPosts(user.userId)).then((res) => {
         const { type, payload } = res;
 
         // 응답이 정상이면
         if (type === "getUserPosts/fulfilled") {
           setPosts(payload.posts);
+        } else {
+          dispatch(logout());
         }
       });
     }
