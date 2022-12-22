@@ -67,19 +67,24 @@ const CommentComponent = ({
   };
   // 댓글 수정
   const commentRetouch = async () => {
-    const retouchedComment = {
-      content: inputValue,
-    };
+    if (inputValue === "") {
+      alert("1자 이상 입력해 주세요.");
+    } else {
+      if (window.confirm("수정하사겠습니까?")) {
+        const retouchedComment = {
+          content: inputValue,
+        };
 
-    dispatch(
-      __putCommentsData({
-        params: params,
-        commentId: commentId,
-        retouchedComment: retouchedComment,
-      })
-    );
-
-    setInputActive(!inputActive);
+        dispatch(
+          __putCommentsData({
+            params: params,
+            commentId: commentId,
+            retouchedComment: retouchedComment,
+          })
+        );
+        setInputActive(!inputActive);
+      }
+    }
   };
   return (
     <>
