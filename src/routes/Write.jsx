@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  useDispatch,
-  useSelector,
-} from "../../node_modules/react-redux/es/exports";
+import { useDispatch } from "../../node_modules/react-redux/es/exports";
 import {
   useNavigate,
   useParams,
 } from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
+import useAuth from "../hooks/useAuth";
 import api from "../lib/api";
-import { __getUserPosts } from "../lib/postApi";
-import {
-  __getPostsData,
-  __postPostData,
-  __putPostData,
-} from "../redux/modules/postSlice";
+import { __putPostData } from "../redux/modules/postSlice";
 
 const WritePage = () => {
   const params = useParams().id;
@@ -39,6 +32,10 @@ const WritePage = () => {
   //image 관련 state
   const [imgUrl, setImgUrl] = useState("");
   const [imgData, setImgData] = useState("");
+
+  // 로그인 확인
+  useAuth();
+
   // ------------------------------------------------------------------
   //params를 통해 초기값을 가져옴
   const getPostedData = async () => {
