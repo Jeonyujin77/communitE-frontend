@@ -12,7 +12,7 @@ import { Colors } from "../../styles/colors";
 const Header = () => {
   const { user } = useSelector((state) => state.user); // 사용자정보 가져오기
   const dispatch = useDispatch();
-  const is_token = document.cookie;
+  const is_token = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
 

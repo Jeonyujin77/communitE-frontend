@@ -12,7 +12,7 @@ import { Colors } from "../styles/colors";
 
 const Login = () => {
   const navigate = useNavigate();
-  const is_token = document.cookie;
+  const is_token = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
   const dispatch = useDispatch();
   const [loginId, loginIdHandler] = useInput(""); // 아이디

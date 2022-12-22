@@ -17,7 +17,7 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userId = localStorage.getItem("userId");
-  const is_token = document.cookie;
+  const is_token = localStorage.getItem("accessToken");
 
   const goToWrite = () => {
     navigate("/write");

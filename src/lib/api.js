@@ -10,15 +10,12 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(function (config) {
-  const accessToken = document.cookie.split(";")[0];
-  const refreshToken = document.cookie.split(";")[1];
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
-  if (accessToken !== undefined && refreshToken !== undefined) {
-    const access = accessToken.split("accessToken=")[1];
-    const refresh = refreshToken.split("refreshToken=")[1];
-    config.headers.access = `${access}`;
-    config.headers.refresh = `${refresh}`;
-  }
+  config.headers.access = `${accessToken}`;
+  config.headers.refresh = `${refreshToken}`;
+
   return config;
 });
 

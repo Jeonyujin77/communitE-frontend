@@ -18,7 +18,7 @@ export const userSlice = createSlice({
     // 로그인 유무 판단
     loginCheck: (state) => {
       const userId = localStorage.getItem("userId");
-      const tokenCheck = document.cookie;
+      const tokenCheck = localStorage.getItem("accessToken");
       // 브라우저에 토큰이 있으면
       if (tokenCheck && userId !== null) {
         state.user = { id: userId }; // 사용자 ID를 가져온다
@@ -26,8 +26,10 @@ export const userSlice = createSlice({
     },
     // 로그아웃
     logout: (state) => {
-      deleteCookie("accessToken"); // access token을 지운다
-      deleteCookie("refreshToken"); // refresh token을 지운다
+      // deleteCookie("accessToken"); // access token을 지운다
+      localStorage.removeItem("accessToken"); // access token을 지운다
+      // deleteCookie("refreshToken"); // refresh token을 지운다
+      localStorage.removeItem("refreshToken"); // refresh token을 지운다
       localStorage.removeItem("userId"); // localstorage의 userId를 지운다
       state.user = null; // 사용자 정보 삭제
       window.location.href = "/"; // 메인으로 이동
