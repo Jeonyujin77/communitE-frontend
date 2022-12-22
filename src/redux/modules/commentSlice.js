@@ -29,7 +29,6 @@ export const __postCommentsData = createAsyncThunk(
         `/api/post/${params}/comments`,
         newComment
       );
-      console.log(data);
       const {
         data: { comments },
       } = await api.get(`/api/post/${params}/comments`);

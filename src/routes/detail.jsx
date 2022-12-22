@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import {
   useDispatch,
@@ -28,6 +28,11 @@ const CommentToggle = ({ desc, inputActive, inputValueState }) => {
   const writeComment = ({ target: { value } }) => {
     setInputValue(value);
   };
+  const [textRows, setTextRows] = useState(1);
+
+  useEffect(() => {
+    setTextRows(inputValue.split("\n").length + 2);
+  });
 
   return (
     <CommentRight inputActive={inputActive}>
@@ -37,6 +42,7 @@ const CommentToggle = ({ desc, inputActive, inputValueState }) => {
         className="commentInput"
         value={inputValue}
         onChange={writeComment}
+        rows={textRows}
       ></textarea>
     </CommentRight>
   );
@@ -153,9 +159,7 @@ const DetailPage = () => {
   useEffect(() => {
     dispatch(__getCommentsData(params));
   }, [dispatch]);
-  for (const comment of commentListed) {
-    console.log(comment.content.length);
-  }
+
   //최신순 정리
   let commentList = [...commentListed];
   commentList = [...commentList.sort((a, b) => b.commentId - a.commentId)];
@@ -387,8 +391,10 @@ const CommentRight = styled.div`
   .commentInput {
     display: ${({ inputActive }) => (inputActive ? "block" : "none")};
     width: 98%;
+    font-size: 17px;
+    line-height: 24px;
     resize: none;
-    height: 60%;
+    min-height: 60%;
     padding: 10px;
     border-radius: 10px;
   }
