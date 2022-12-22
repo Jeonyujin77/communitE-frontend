@@ -16,6 +16,7 @@ import {
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const userId = localStorage.getItem("userId");
   const is_token = document.cookie;
 
   const goToWrite = () => {
@@ -31,7 +32,7 @@ const Home = () => {
   }, [dispatch]);
 
   // 로그인 유무에 따라 버튼 display 변경
-  const isLogined = is_token !== "" ? true : false;
+  const isLogined = is_token !== "" && userId !== null ? true : false;
 
   return (
     <>

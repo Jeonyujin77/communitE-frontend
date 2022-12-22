@@ -13,16 +13,17 @@ import { Colors } from "../styles/colors";
 const Login = () => {
   const navigate = useNavigate();
   const is_token = document.cookie;
+  const userId = localStorage.getItem("userId");
   const dispatch = useDispatch();
   const [loginId, loginIdHandler] = useInput(""); // 아이디
   const [password, passwordHandler] = useInput(""); // 비밀번호
 
   // 로그인 되어있으면 메인으로 이동한다.
   useEffect(() => {
-    if (is_token) {
+    if (is_token !== "" && userId !== null) {
       navigate("/");
     }
-  }, [is_token, navigate]);
+  }, [is_token, userId, navigate]);
 
   const onSubmit = (event) => {
     event.preventDefault();

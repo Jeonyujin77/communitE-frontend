@@ -12,6 +12,7 @@ import { idCheck, pwCheck } from "../utils/RegExp";
 const Join = () => {
   const navigate = useNavigate();
   const is_token = document.cookie; // 쿠키
+  const userId = localStorage.getItem("userId");
   const dispatch = useDispatch();
   const [loginId, setLoginId] = useState(""); // 아이디
   const [nickname, setNickname] = useState(""); // 닉네임
@@ -25,8 +26,8 @@ const Join = () => {
 
   // 로그인한 상태이면 메인으로 리다이렉트시킴
   useEffect(() => {
-    if (is_token !== "") navigate("/");
-  }, [is_token, navigate]);
+    if (is_token !== "" && userId !== null) navigate("/");
+  }, [is_token, userId, navigate]);
 
   // 아이디 입력 시
   const onChangeId = (e) => {
