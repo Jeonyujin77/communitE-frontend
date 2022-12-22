@@ -11,7 +11,7 @@ import { idCheck, pwCheck } from "../utils/RegExp";
 
 const Join = () => {
   const navigate = useNavigate();
-  const is_token = document.cookie; // 쿠키
+  const is_token = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
   const dispatch = useDispatch();
   const [loginId, setLoginId] = useState(""); // 아이디

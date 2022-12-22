@@ -7,7 +7,6 @@ import {
 } from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
-import useAuth from "../hooks/useAuth";
 import api from "../lib/api";
 import { __putPostData } from "../redux/modules/postSlice";
 
@@ -32,9 +31,6 @@ const WritePage = () => {
   //image 관련 state
   const [imgUrl, setImgUrl] = useState("");
   const [imgData, setImgData] = useState("");
-
-  // 로그인 확인
-  useAuth();
 
   // ------------------------------------------------------------------
   //params를 통해 초기값을 가져옴
@@ -143,7 +139,7 @@ const WritePage = () => {
   //url로 입장해도 token 검사를 실행하여, 로그인이 안되어있으면 다시 메인 페이지로 리다이렉트
   useEffect(() => {
     //토큰으로 로그인 유무 판단
-    const is_token = document.cookie;
+    const is_token = localStorage.getItem("accessToken");
     if (!is_token) {
       navigate("/");
     }

@@ -7,7 +7,7 @@ import { getUserInfo, logout } from "../redux/modules/userSlice";
 const useAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const is_token = document.cookie;
+  const is_token = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
 
   // 화면이 로드됨과 동시에 사용자정보를 조회한다
