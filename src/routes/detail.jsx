@@ -158,7 +158,7 @@ const DetailPage = () => {
   const [wroteComment, setwroteComment] = useState("");
 
   //댓글 리스트
-  const commentListed = useSelector((state) => state.comments.comments);
+  const commentList = useSelector((state) => state.comments.comments);
 
   // 댓글 리스트 불러오기
   useEffect(() => {
