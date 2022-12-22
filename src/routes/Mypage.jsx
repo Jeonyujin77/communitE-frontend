@@ -31,8 +31,6 @@ const Mypage = () => {
         // 응답이 정상이면
         if (type === "getUserPosts/fulfilled") {
           setPosts(payload.posts);
-        } else {
-          dispatch(logout());
         }
       });
     }
