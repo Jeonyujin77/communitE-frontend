@@ -28,7 +28,6 @@ function App() {
           <Route exact path="/mypage" element={<Mypage />} />
           <Route exact path="/join" element={<Join />} />
           <Route exact path="/login" element={<Login />} />
-          <Route exact path="/demo" element={<Demo />} />
           <Route exact path="/" element={<Home />} />
           <Route exact path="/post/:id" element={<DetailPage />} />
           <Route exact path="/write" element={<WritePage />} />
