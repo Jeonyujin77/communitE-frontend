@@ -375,6 +375,7 @@ const CommentLeft = styled.div`
 const CommentRight = styled.div`
   line-height: 24px;
   width: 100%;
+  margin-bottom: 10px;
   .commentDesc {
     display: ${({ inputActive }) => (inputActive ? "none" : "block")};
     white-space: pre-wrap;

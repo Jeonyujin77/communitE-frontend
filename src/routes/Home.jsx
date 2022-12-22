@@ -48,7 +48,11 @@ const Home = () => {
         </ListAddBtnWrap>
       </Section>
       <Section>
-        <PostListContainer posts={posts} />
+        {posts.length === 0 ? (
+          <ListAddComment>로그인하여 첫 게시물을 작성해주세요!</ListAddComment>
+        ) : (
+          <PostListContainer posts={posts} />
+        )}
       </Section>
     </>
   );
@@ -58,5 +62,14 @@ const ListAddBtnWrap = styled.div`
   display: ${({ isLogined }) => (isLogined ? "flex" : "none")};
   align-items: center;
   justify-content: right;
+`;
+const ListAddComment = styled.div`
+  width: 100%;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: gray;
 `;
 export default Home;
