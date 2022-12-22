@@ -25,7 +25,4 @@
 ```
 
 ## 시연 영상 URL
-
-```
-    <https://www.youtube.com/watch?v=kzmGT7BQ4Lg>
-```
+<https://www.youtube.com/watch?v=kzmGT7BQ4Lg>
