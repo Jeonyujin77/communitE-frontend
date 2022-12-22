@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
 import PostListContainer from "../components/postList/PostList";
 import { __getUserPosts } from "../lib/postApi";
-import { logout } from "../redux/modules/userSlice";
 
 const Mypage = () => {
   const navigate = useNavigate();
