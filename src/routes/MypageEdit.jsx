@@ -113,7 +113,7 @@ const MypageEdit = () => {
     formData.append("nickname", nickname);
 
     // 닉네임 중복 확인 여부 true인 경우에만 수정한다
-    if (checkNickDup) {
+    if (checkNickDup || user.nickname === nickname) {
       dispatch(__modifyUserInfo({ userId, formData })).then((res) => {
         const { type, payload } = res;
         // 응답이 정상이면
