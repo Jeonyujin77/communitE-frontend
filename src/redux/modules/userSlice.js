@@ -20,7 +20,7 @@ export const userSlice = createSlice({
       const userId = localStorage.getItem("userId");
       const tokenCheck = document.cookie;
       // 브라우저에 토큰이 있으면
-      if (tokenCheck) {
+      if (tokenCheck && userId !== null) {
         state.user = { id: userId }; // 사용자 ID를 가져온다
       }
     },
