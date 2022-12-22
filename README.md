@@ -22,3 +22,6 @@
 
 ## 시연 영상 URL
 <https://www.youtube.com/watch?v=kzmGT7BQ4Lg>
+
+## 대시보드
+<https://deepsea-dev.tistory.com/34>
