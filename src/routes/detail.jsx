@@ -10,7 +10,6 @@ import {
 } from "../../node_modules/react-router-dom/dist/index";
 import Button from "../components/common/Button";
 import Section from "../components/layout/Section";
-import useAuth from "../hooks/useAuth";
 import {
   __deleteCommentsData,
   __getCommentsData,
@@ -135,9 +134,6 @@ const DetailPage = () => {
   //redux에 저장된 상세페이지 데이터 소환
   const post = useSelector((state) => state.posts.post);
 
-  // 로그인 확인
-  useAuth();
-
   // 렌더링 시 데이터 조회
   useEffect(() => {
     dispatch(__getPostData(params));
@@ -175,7 +171,7 @@ const DetailPage = () => {
   };
 
   // 댓글 등록
-  const isLogined = document.cookie;
+  const isLogined = localStorage.getItem("accessToken");
   const commentPost = async () => {
     //넣을 새 댓글
     if (!isLogined) {
