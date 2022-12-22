@@ -8,7 +8,6 @@ export const __login = createAsyncThunk("login", async (payload, thunkAPI) => {
   try {
     const response = await api.post("/api/user/login", { loginId, password });
     const { accesstoken, refreshtoken } = response.headers;
-    console.log(accesstoken, refreshtoken);
     // access token 생성
     localStorage.setItem("accessToken", accesstoken);
     // setCookie("accessToken", accesstoken, 7);
