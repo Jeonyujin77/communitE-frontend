@@ -147,9 +147,11 @@ const WritePage = () => {
   useEffect(() => {
     //토큰으로 로그인 유무 판단
     const is_token = document.cookie;
-
+    if (!is_token) {
+      navigate("/");
+    }
     if (usersId) {
-      if (!is_token || usersId.toString() !== localStorage.getItem("userId")) {
+      if (usersId.toString() !== localStorage.getItem("userId")) {
         navigate("/");
       }
     }
