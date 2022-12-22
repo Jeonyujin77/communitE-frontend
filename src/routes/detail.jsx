@@ -153,7 +153,9 @@ const DetailPage = () => {
   useEffect(() => {
     dispatch(__getCommentsData(params));
   }, [dispatch]);
-
+  for (const comment of commentListed) {
+    console.log(comment.content.length);
+  }
   //최신순 정리
   let commentList = [...commentListed];
   commentList = [...commentList.sort((a, b) => b.commentId - a.commentId)];
@@ -307,6 +309,7 @@ const PostContent = styled.div`
   .postDesc {
     font-size: 20px;
     line-height: 27px;
+    white-space: pre-wrap;
     word-break: break-all;
   }
 `;
