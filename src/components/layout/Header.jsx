@@ -30,7 +30,7 @@ const Header = () => {
   }, [is_token, dispatch, userId, navigate]);
 
   const onLogout = () => {
-    dispatch(logout());
+    if (window.confirm("로그아웃 하시겠습니까?")) dispatch(logout());
   };
 
   return (
