@@ -25,7 +25,11 @@ export const __postCommentsData = createAsyncThunk(
   "postComments",
   async ({ params, newComment }, thunkAPI) => {
     try {
-      await api.post(`/api/post/${params}/comments`, newComment);
+      const { data } = await api.post(
+        `/api/post/${params}/comments`,
+        newComment
+      );
+      console.log(data);
       const {
         data: { comments },
       } = await api.get(`/api/post/${params}/comments`);
